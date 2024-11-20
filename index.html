@@ -6,7 +6,8 @@
 
             let canvas = null;
             let context = null;
-            let puzzleData =
+
+            let puzzleAnswers =
                 'v_______________' +
                 'aardvark________' +
                 'n___o___________' +
@@ -23,6 +24,8 @@
                 '________________' +
                 '________________' +
                 '________________';
+
+            let puzzleData = puzzleAnswers.replaceAll(/[^_]/gi, ' ');
 
             let clues = [
                 {row: 0, col: 0, hint: 'rare metal', num: 1, dir: 'down'},
@@ -215,10 +218,10 @@
                         navigateLeft();
                         break;
                     case 'Tab':
+                        event.preventDefault();
                         swapHighlightDirection();
                         break;
                     case 'Backspace':
-                        // Delete the current letter and move backward
                         backspace();
                         break;
                     default: {
@@ -250,7 +253,6 @@
                     currentWordDir = 'horz';
                 }
                 updateFocus();
-                event.preventDefault();
             }
 
             function enterSpace() {
@@ -293,7 +295,7 @@
                     while (newCol < NUM_COLS - 1) {
                         const val = getCellValue(focusRow, newCol);
                         if (val == '_') {
-                            // No more remaining
+                            // No more blanks remaining
                             break;
                         } else  if (val == ' ') {
                             focusCol = newCol;
