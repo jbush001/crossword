@@ -1,0 +1,407 @@
+<html>
+    <head>
+        <script>
+            let NUM_ROWS = 16;
+            let NUM_COLS = 16;
+
+            let canvas = null;
+            let context = null;
+            let puzzleData =
+                'v_______________' +
+                'aardvark________' +
+                'n___o___________' +
+                'a___ligament____' +
+                'drake_____e_____' +
+                'i________ever___' +
+                'u_________e_____' +
+                'm___score_r_____' +
+                '_______a__l_____' +
+                '_______puma_____' +
+                '__________n_____' +
+                '___edgelord_____' +
+                '________________' +
+                '________________' +
+                '________________' +
+                '________________';
+
+            let clues = [
+                {row: 0, col: 0, hint: 'rare metal', num: 1, dir: 'down'},
+                {row: 1, col: 0, hint: 'first entry in any encyclopedia', num: 2, dir: 'across'},
+                {row: 1, col: 4, hint: 'small rodent that rhymes with its more popular cousin', num: 3, dir: 'down'},
+                {row: 3, col: 4, hint: 'connects bones', num: 4, dir: 'across'},
+                {row: 4, col: 0, hint: 'male duck', num: 11, dir: 'across'},
+                {row: 3, col: 10, hint: 'home for peter and pirates', num: 5, dir: 'down'},
+                {row: 5, col: 9, hint: 'always', num: 10, dir: 'across'},
+                {row: 7, col: 4, hint: 'how we keep track', num: 6, dir: 'across'},
+                {row: 7, col: 7, hint: 'shoot the breeze', num: 7, dir: 'down'},
+                {row: 9, col: 7, hint: 'cougar, mountain lion', num: 8, dir: 'across'},
+                {row: 11, col: 3, hint: 'internet provocateur', num: 9, dir: 'across'}
+            ];
+
+            let startSquares = [];
+            let focusRow = 0;
+            let focusCol = 0;
+            let currentWordStart = 0;
+            let currentWordEnd = 0;
+            let currentWordDir = 'vert';
+            let currentClue = -1;
+
+            function init() {
+                canvas = document.getElementById('c');
+                context = canvas.getContext('2d');
+
+                // Set up startSquares array
+                for (let i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+                    startSquares.push(-1);
+                }
+
+                for (const clue of clues) {
+                    console.log(clue);
+                    startSquares[clue.row * NUM_COLS + clue.col] = clue.num;
+                }
+
+                console.log(startSquares);
+
+                document.onkeydown = handleKeyDown;
+                document.onmousedown = handleMouseDown;
+                render();
+            }
+
+            function getCellValue(row, col) {
+                return puzzleData[row * NUM_COLS + col];
+            }
+
+            function setCellValue(row, col, val) {
+                const offset = focusRow * NUM_COLS + focusCol;
+                puzzleData = puzzleData.slice(0, offset) +
+                    val + puzzleData.slice(offset + 1);
+            }
+
+            function render() {
+                const CELL_WIDTH = canvas.width / NUM_COLS;
+                const CELL_HEIGHT = (canvas.height - 20) / NUM_ROWS;
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw focus highlight
+                context.fillStyle = '#c0c0f0';
+                if (currentWordDir == 'horz') {
+                    context.fillRect(currentWordStart * CELL_WIDTH, focusRow * CELL_HEIGHT,
+                                    (currentWordEnd - currentWordStart + 1) * CELL_WIDTH,
+                                    CELL_HEIGHT);
+                } else {
+                    context.fillRect(focusCol * CELL_WIDTH, currentWordStart * CELL_HEIGHT,
+                                    CELL_WIDTH,
+                                    (currentWordEnd - currentWordStart + 1) * CELL_HEIGHT);
+                }
+
+                context.strokeStyle = 'gray';
+                context.lineWidth = '1px';
+                for (let rowi = 0; rowi <= NUM_ROWS; rowi++) {
+                    const y = CELL_HEIGHT * rowi;
+                    context.moveTo(0, y);
+                    context.lineTo(NUM_COLS * CELL_WIDTH, y);
+                }
+
+                for (let coli = 0; coli <= NUM_COLS; coli++) {
+                    const x = CELL_WIDTH * coli;
+                    context.moveTo(x, 0);
+                    context.lineTo(x, NUM_ROWS * CELL_HEIGHT);
+                }
+
+                context.stroke();
+
+                for (let rowi = 0; rowi < NUM_ROWS; rowi++) {
+                    for (let coli = 0; coli < NUM_COLS; coli++) {
+                        const ch = getCellValue(rowi, coli).toUpperCase();
+                        if (ch == '_') {
+                            context.fillStyle = 'black';
+                            context.fillRect(coli * CELL_WIDTH, rowi * CELL_HEIGHT,
+                                             CELL_WIDTH, CELL_HEIGHT);
+                        } else {
+                            if (rowi == focusRow && coli == focusCol) {
+                                context.fillStyle = '#ffff6e';
+                                context.fillRect(coli * CELL_WIDTH, rowi * CELL_HEIGHT,
+                                                 CELL_WIDTH, CELL_HEIGHT);
+                            }
+
+                            context.fillStyle = 'black';
+                            context.font = '20pt sans-serif';
+                            context.fontWeight = 'bold';
+                            const metrics = context.measureText(ch);
+                            const x = coli * CELL_WIDTH + (CELL_WIDTH - metrics.width) / 2;
+                            const glyphHeight = metrics.fontBoundingBoxAscent +
+                                                metrics.fontBoundingBoxDescent;
+                            const y = rowi * CELL_HEIGHT + (CELL_HEIGHT - glyphHeight) / 2 +
+                                            metrics.fontBoundingBoxAscent;
+                            context.fillText(ch, x, y);
+
+                            const startNum = startSquares[rowi * NUM_COLS + coli];
+                            if (startNum != -1) {
+                                context.font = '10px sans-serif';
+                                context.fontWeight = 'normal';
+                                context.fillText(startNum.toString(), coli * CELL_WIDTH + 2,
+                                                 rowi * CELL_HEIGHT + 10);
+                            }
+                        }
+                    }
+                }
+
+                if (currentClue != -1) {
+                    context.fillStyle = 'black';
+                    context.font = '12pt sans-serif';
+                    context.fontWeight = 'bold';
+                    const clue = clues[currentClue];
+                    context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
+                }
+            }
+
+            function updateFocus() {
+                findHighlightWord();
+                render();
+            }
+
+            function navigateRight() {
+                for (let i = focusCol + 1; i < NUM_COLS; i++) {
+                    if (getCellValue(focusRow, i) != '_') {
+                        focusCol = i;
+                        updateFocus();
+                        break;
+                    }
+                }
+            }
+
+            function navigateLeft() {
+                for (let i = focusCol - 1; i >= 0; i--) {
+                    if (getCellValue(focusRow, i) != '_') {
+                        focusCol = i;
+                        updateFocus();
+                        break;
+                    }
+                }
+            }
+
+            function navigateUp() {
+                for (let i = focusRow - 1; i >= 0; i--) {
+                    if (getCellValue(i, focusCol) != '_') {
+                        focusRow = i;
+                        updateFocus();
+                        break;
+                    }
+                }
+            }
+
+            function navigateDown() {
+                for (let i = focusRow + 1; i < NUM_ROWS; i++) {
+                    if (getCellValue(i, focusCol) != '_') {
+                        focusRow = i;
+                        updateFocus();
+                        break;
+                    }
+                }
+            }
+
+            function handleKeyDown(event) {
+                switch (event.key) {
+                    case 'ArrowDown':
+                        navigateDown();
+                        break;
+                    case 'ArrowRight':
+                        navigateRight();
+                        break;
+                    case 'ArrowUp':
+                        navigateUp();
+                        break;
+                    case 'ArrowLeft':
+                        navigateLeft();
+                        break;
+                    case 'Tab':
+                        swapHighlightDirection();
+                        break;
+                    case 'Backspace':
+                        // Delete the current letter and move backward
+                        backspace();
+                        break;
+                    default: {
+                        if (event.key.length == 1) {
+                            const code = event.key.charCodeAt(0);
+                            if (code == 32) {
+                                enterSpace();
+                            } else if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
+                                (code > 96 && code < 123)) {
+                                    enterLetter(event.key);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            function enterLetter(val) {
+                setCellValue(focusRow, focusCol, val);
+                findNextUnfilled();
+                updateFocus();
+            }
+
+            function swapHighlightDirection() {
+                if (currentWordDir == 'horz') {
+                    currentWordDir = 'vert';
+                } else {
+                    currentWordDir = 'horz';
+                }
+                updateFocus();
+                event.preventDefault();
+            }
+
+            function enterSpace() {
+                setCellValue(focusRow, focusCol, ' ');
+                if (currentWordDir == 'horz') {
+                    if (focusCol < NUM_COLS - 1 &&
+                        getCellValue(focusRow, focusCol + 1) != '_') {
+                        focusCol++;
+                    }
+                } else {
+                    if (focusRow < NUM_ROWS - 1 &&
+                        getCellValue(focusRow + 1, focusCol) != '_') {
+                        focusRow++;
+                    }
+                }
+
+                updateFocus();
+            }
+
+            function backspace() {
+                setCellValue(focusRow, focusCol, ' ');
+                if (currentWordDir == 'horz') {
+                    if (focusCol > 0 &&
+                        getCellValue(focusRow, focusCol - 1) != '_') {
+                        focusCol--;
+                    }
+                } else {
+                    if (focusRow > 0 &&
+                        getCellValue(focusRow - 1, focusCol) != '_') {
+                        focusRow--;
+                    }
+                }
+
+                render();
+            }
+
+            function findNextUnfilled() {
+                if (currentWordDir == 'horz') {
+                    let newCol = focusCol;
+                    while (newCol < NUM_COLS - 1) {
+                        const val = getCellValue(focusRow, newCol);
+                        if (val == '_') {
+                            // No more remaining
+                            break;
+                        } else  if (val == ' ') {
+                            focusCol = newCol;
+                            break;
+                        }
+
+                        newCol++;
+                    }
+                } else {
+                    let newRow = focusRow;
+                    while (newRow < NUM_ROWS - 1) {
+                        const val = getCellValue(newRow, focusCol);
+                        if (val == '_') {
+                            // No more blanks remaining
+                            break;
+                        } else  if (val == ' ') {
+                            focusRow = newRow;
+                            break;
+                        }
+
+                        newRow++;
+                    }
+                }
+            }
+
+            function handleMouseDown(event) {
+                const CELL_WIDTH = canvas.width / NUM_COLS;
+                const CELL_HEIGHT = (canvas.height - 15) / NUM_ROWS;
+                const clickCol = Math.floor(event.x / CELL_WIDTH);
+                const clickRow = Math.floor(event.y / CELL_HEIGHT);
+                if (clickCol >= 0 && clickCol < NUM_COLS && clickRow >= 0 && clickRow < NUM_ROWS) {
+                    if (puzzleData[clickRow * NUM_COLS + clickCol] != '_') {
+                        focusRow = clickRow;
+                        focusCol = clickCol;
+                        updateFocus();
+                    }
+                }
+            }
+
+            function findWordBoundaries() {
+                let left = focusCol;
+                while (left > 0 && getCellValue(focusRow, left - 1) != '_') {
+                    left--;
+                }
+
+                let right = focusCol;
+                while (right < NUM_COLS - 1 && getCellValue(focusRow, right + 1) != '_') {
+                    right++;
+                }
+
+                let top = focusRow;
+                while (top > 0 && getCellValue(top - 1, focusCol) != '_') {
+                    top--;
+                }
+
+                let bottom = focusRow;
+                while (bottom < NUM_ROWS - 1 && getCellValue(bottom + 1, focusCol) != '_') {
+                    bottom++;
+                }
+
+                return [left, top, right, bottom];
+            }
+
+            function findHighlightWord() {
+                let [left, top, right, bottom] = findWordBoundaries();
+                if (left == right && left == focusCol) {
+                    // There is no horizontal word
+                    currentWordDir = 'vert';
+                } else if (bottom == top && bottom == focusRow) {
+                    // There is no vertical word
+                    currentWordDir = 'horz';
+                }
+
+                // else there is both a horizontal and vertical word here and
+                // currentWordDir remains what it was previously.
+                if (currentWordDir == 'vert') {
+                    currentWordStart = top;
+                    currentWordEnd = bottom;
+                } else {
+                    currentWordStart = left;
+                    currentWordEnd = right;
+                }
+
+                // Find the corresponding clue
+                findCurrentClue();
+            }
+
+            function findCurrentClue() {
+                currentClue = -1;
+                for (let i = 0; i < clues.length; i++) {
+                    const clue = clues[i];
+                    if (currentWordDir == 'vert') {
+                        if (clue.dir == 'down' && clue.col == focusCol && clue.row == currentWordStart) {
+                            currentClue = i;
+                            break;
+                        }
+                    } else {
+                        if (clue.dir == 'across' && clue.row == focusRow && clue.col == currentWordStart) {
+                            currentClue = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body onload="init()">
+        <canvas id="c" width="600" height="620"></canvas>
+        <div id="hint"></div>
+    </body>
+</html>
