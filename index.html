@@ -49,7 +49,7 @@
             let focusCol = 0;
             let currentWordStart = 0;
             let currentWordEnd = 0;
-            let currentWordDir = 'vert';
+            let currentWordDir = 'down';
             let currentClue = -1;
 
             function init() {
@@ -94,7 +94,7 @@
 
                 // Draw focus highlight
                 context.fillStyle = '#c0c0f0';
-                if (currentWordDir == 'horz') {
+                if (currentWordDir == 'across') {
                     context.fillRect(currentWordStart * CELL_WIDTH, focusRow * CELL_HEIGHT,
                                     (currentWordEnd - currentWordStart + 1) * CELL_WIDTH,
                                     CELL_HEIGHT);
@@ -229,9 +229,22 @@
                     case 'ArrowLeft':
                         navigateLeft();
                         break;
+                    case ' ':
+                        swapHighlightDirection();
+                        break;
                     case 'Tab':
                         event.preventDefault();
-                        swapHighlightDirection();
+                        currentClue++;
+                        if (currentClue >= clues.length) {
+                            currentClue = 0;
+                        }
+
+                        focusRow = clues[currentClue].row;
+                        focusCol = clues[currentClue].col;
+                        currentWordDir = clues[currentClue].dir;
+                        findHighlightWord();
+                        findNextUnfilled();
+                        render();
                         break;
                     case 'Backspace':
                         backspace();
@@ -239,9 +252,7 @@
                     default: {
                         if (event.key.length == 1) {
                             const code = event.key.charCodeAt(0);
-                            if (code == 32) {
-                                enterSpace();
-                            } else if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
+                            if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
                                 (code > 96 && code < 123)) {
                                     enterLetter(event.key);
                             }
@@ -259,34 +270,17 @@
             }
 
             function swapHighlightDirection() {
-                if (currentWordDir == 'horz') {
-                    currentWordDir = 'vert';
+                if (currentWordDir == 'across') {
+                    currentWordDir = 'down';
                 } else {
-                    currentWordDir = 'horz';
+                    currentWordDir = 'across';
                 }
-                updateFocus();
-            }
-
-            function enterSpace() {
-                setCellValue(focusRow, focusCol, ' ');
-                if (currentWordDir == 'horz') {
-                    if (focusCol < NUM_COLS - 1 &&
-                        getCellValue(focusRow, focusCol + 1) != '_') {
-                        focusCol++;
-                    }
-                } else {
-                    if (focusRow < NUM_ROWS - 1 &&
-                        getCellValue(focusRow + 1, focusCol) != '_') {
-                        focusRow++;
-                    }
-                }
-
                 updateFocus();
             }
 
             function backspace() {
                 setCellValue(focusRow, focusCol, ' ');
-                if (currentWordDir == 'horz') {
+                if (currentWordDir == 'across') {
                     if (focusCol > 0 &&
                         getCellValue(focusRow, focusCol - 1) != '_') {
                         focusCol--;
@@ -302,7 +296,7 @@
             }
 
             function findNextUnfilled() {
-                if (currentWordDir == 'horz') {
+                if (currentWordDir == 'across') {
                     let newCol = focusCol;
                     while (newCol < NUM_COLS - 1) {
                         const val = getCellValue(focusRow, newCol);
@@ -375,15 +369,15 @@
                 let [left, top, right, bottom] = findWordBoundaries();
                 if (left == right && left == focusCol) {
                     // There is no horizontal word
-                    currentWordDir = 'vert';
+                    currentWordDir = 'down';
                 } else if (bottom == top && bottom == focusRow) {
                     // There is no vertical word
-                    currentWordDir = 'horz';
+                    currentWordDir = 'across';
                 }
 
                 // else there is both a horizontal and vertical word here and
                 // currentWordDir remains what it was previously.
-                if (currentWordDir == 'vert') {
+                if (currentWordDir == 'down') {
                     currentWordStart = top;
                     currentWordEnd = bottom;
                 } else {
@@ -399,7 +393,7 @@
                 currentClue = -1;
                 for (let i = 0; i < clues.length; i++) {
                     const clue = clues[i];
-                    if (currentWordDir == 'vert') {
+                    if (currentWordDir == 'down') {
                         if (clue.dir == 'down' && clue.col == focusCol && clue.row == currentWordStart) {
                             currentClue = i;
                             break;
