@@ -3,47 +3,51 @@
         <script>
             'use strict';
 
-            let NUM_ROWS = 16;
-            let NUM_COLS = 16;
+            let NUM_ROWS = 15;
+            let NUM_COLS = 15;
             let cellWidth = 0;
             let cellHeight = 0;
+            let solved = false;
 
             let canvas = null;
             let context = null;
 
             let showMistakes = true;
             let puzzleAnswers =
-                'v_______________' +
-                'aardvark________' +
-                'n___o___________' +
-                'a___ligament____' +
-                'drake_____e_____' +
-                'i________ever___' +
-                'u_________e_____' +
-                'm___score_r_____' +
-                '_______a__l_____' +
-                '_______puma_____' +
-                '__________n_____' +
-                '___edgelord_____' +
-                '________________' +
-                '________________' +
-                '________________' +
-                '________________';
+                'v______________' +
+                'aardvark_______' +
+                'n_e_o__________' +
+                'a_b_ligament___' +
+                'drake_a___e____' +
+                'i_r___l__ever__' +
+                'u_____l___e____' +
+                'm___score_r____' +
+                '____a__a__l____' +
+                '____w__puma____' +
+                '_____o____n____' +
+                '___edgelord____' +
+                '_____r_________' +
+                '_____e_________' +
+                '_______________';
 
             let puzzleData = puzzleAnswers.replaceAll(/[^_]/gi, ' ');
 
             let clues = [
                 {row: 0, col: 0, hint: 'rare metal', num: 1, dir: 'down'},
                 {row: 1, col: 0, hint: 'first entry in any encyclopedia', num: 2, dir: 'across'},
-                {row: 1, col: 4, hint: 'small rodent that rhymes with its more popular cousin', num: 3, dir: 'down'},
-                {row: 3, col: 4, hint: 'connects bones', num: 4, dir: 'across'},
-                {row: 4, col: 0, hint: 'male duck', num: 11, dir: 'across'},
-                {row: 3, col: 10, hint: 'home for peter and pirates', num: 5, dir: 'down'},
-                {row: 5, col: 9, hint: 'always', num: 10, dir: 'across'},
-                {row: 7, col: 4, hint: 'how we keep track', num: 6, dir: 'across'},
-                {row: 7, col: 7, hint: 'shoot the breeze', num: 7, dir: 'down'},
-                {row: 9, col: 7, hint: 'cougar, mountain lion', num: 8, dir: 'across'},
-                {row: 11, col: 3, hint: 'internet provocateur', num: 9, dir: 'across'}
+                {row: 1, col: 2, hint: 'concrete is brittle without', num: 3, dir: 'down'},
+                {row: 1, col: 4, hint: 'small rodent that rhymes with its more popular cousin', num: 4, dir: 'down'},
+                {row: 3, col: 4, hint: 'connects bones', num: 5, dir: 'across'},
+                {row: 4, col: 0, hint: 'male duck', num: 6, dir: 'across'},
+                {row: 3, col: 6, hint: 'cheap wine', num: 7, dir: 'down'},
+                {row: 3, col: 10, hint: 'home for peter and pirates', num: 8, dir: 'down'},
+                {row: 5, col: 9, hint: 'always', num: 9, dir: 'across'},
+                {row: 7, col: 4, hint: 'how we keep track', num: 10, dir: 'across'},
+                {row: 7, col: 4, hint: 'movie series featuring a goldbergian psychopath', num: 10, dir: 'down'},
+                {row: 7, col: 7, hint: 'shoot the breeze', num: 11, dir: 'down'},
+                {row: 9, col: 7, hint: 'cougar, mountain lion', num: 12, dir: 'across'},
+                {row: 11, col: 3, hint: 'internet provocateur', num: 13, dir: 'across'},
+                {row: 10, col: 5, hint: 'Shrek and friends', num: 14, dir: 'down'}
             ];
 
             let startSquares = [];
@@ -93,15 +97,17 @@
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Draw focus highlight
-                context.fillStyle = '#b2bfdd';
-                if (currentWordDir == 'across') {
-                    context.fillRect(currentWordStart * cellWidth, focusRow * cellHeight,
-                                    (currentWordEnd - currentWordStart + 1) * cellWidth,
-                                    cellHeight);
-                } else {
-                    context.fillRect(focusCol * cellWidth, currentWordStart * cellHeight,
-                                    cellWidth,
-                                    (currentWordEnd - currentWordStart + 1) * cellHeight);
+                if (!solved) {
+                    context.fillStyle = '#b2bfdd';
+                    if (currentWordDir == 'across') {
+                        context.fillRect(currentWordStart * cellWidth, focusRow * cellHeight,
+                                        (currentWordEnd - currentWordStart + 1) * cellWidth,
+                                        cellHeight);
+                    } else {
+                        context.fillRect(focusCol * cellWidth, currentWordStart * cellHeight,
+                                        cellWidth,
+                                        (currentWordEnd - currentWordStart + 1) * cellHeight);
+                    }
                 }
 
                 for (let rowi = 0; rowi < NUM_ROWS; rowi++) {
@@ -112,7 +118,7 @@
                             context.fillRect(coli * cellWidth, rowi * cellHeight,
                                              cellWidth, cellHeight);
                         } else {
-                            if (rowi == focusRow && coli == focusCol) {
+                            if (rowi == focusRow && coli == focusCol && !solved) {
                                 context.fillStyle = '#596fa1';
                                 context.fillRect(coli * cellWidth, rowi * cellHeight,
                                                  cellWidth, cellHeight);
@@ -123,7 +129,7 @@
                             } else {
                                 context.fillStyle = 'black';
                             }
-                            context.font = '20pt sans-serif';
+                            context.font = '16pt monospace';
                             context.fontWeight = 'bold';
                             const metrics = context.measureText(ch);
                             const x = coli * cellWidth + (cellWidth - metrics.width) / 2;
@@ -136,7 +142,7 @@
                             const startNum = startSquares[rowi * NUM_COLS + coli];
                             if (startNum != -1) {
                                 context.fillStyle = 'black';
-                                context.font = '10px sans-serif';
+                                context.font = '8pt monospace';
                                 context.fontWeight = 'normal';
                                 context.fillText(startNum.toString(), coli * cellWidth + 2,
                                                  rowi * cellHeight + 10);
@@ -145,9 +151,9 @@
                     }
                 }
 
-                if (currentClue != -1) {
+                if (!solved) {
                     context.fillStyle = 'black';
-                    context.font = '12pt sans-serif';
+                    context.font = '12pt monospace';
                     context.fontWeight = 'bold';
                     const clue = clues[currentClue];
                     context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
@@ -218,6 +224,10 @@
             }
 
             function handleKeyDown(event) {
+                if (solved) {
+                    return;
+                }
+
                 switch (event.key) {
                     case 'ArrowDown':
                         navigateDown();
@@ -269,6 +279,11 @@
                 setCellValue(focusRow, focusCol, val);
                 findNextUnfilled();
                 updateFocus();
+
+                if (puzzleAnswers == puzzleData) {
+                    solved = true;
+                    render();
+                }
             }
 
             function swapHighlightDirection() {
@@ -330,6 +345,10 @@
             }
 
             function handleMouseDown(event) {
+                if (solved) {
+                    return;
+                }
+
                 const clickCol = Math.floor(event.x / cellWidth);
                 const clickRow = Math.floor(event.y / cellHeight);
                 if (clickCol >= 0 && clickCol < NUM_COLS && clickRow >= 0 && clickRow < NUM_ROWS) {
