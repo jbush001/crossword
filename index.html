@@ -17,37 +17,38 @@
                 'v______________' +
                 'aardvark_______' +
                 'n_e_o__________' +
-                'a_b_ligament___' +
+                'a_b_ligaments__' +
                 'drake_a___e____' +
                 'i_r___l__ever__' +
                 'u_____l___e____' +
                 'm___score_r____' +
                 '____a__a__l____' +
                 '____w__puma____' +
-                '_____o____n____' +
+                '_____o____norad' +
                 '___edgelord____' +
                 '_____r_________' +
                 '_____e_________' +
-                '_______________';
+                '_____s_________';
 
             let puzzleData = puzzleAnswers.replaceAll(/[^_]/gi, ' ');
 
             let clues = [
-                {row: 0, col: 0, hint: 'rare metal', num: 1, dir: 'down'},
-                {row: 1, col: 0, hint: 'first entry in any encyclopedia', num: 2, dir: 'across'},
-                {row: 1, col: 2, hint: 'concrete is brittle without', num: 3, dir: 'down'},
-                {row: 1, col: 4, hint: 'small rodent that rhymes with its more popular cousin', num: 4, dir: 'down'},
-                {row: 3, col: 4, hint: 'connects bones', num: 5, dir: 'across'},
-                {row: 4, col: 0, hint: 'male duck', num: 6, dir: 'across'},
-                {row: 3, col: 6, hint: 'cheap wine', num: 7, dir: 'down'},
-                {row: 3, col: 10, hint: 'home for peter and pirates', num: 8, dir: 'down'},
-                {row: 5, col: 9, hint: 'always', num: 9, dir: 'across'},
-                {row: 7, col: 4, hint: 'how we keep track', num: 10, dir: 'across'},
-                {row: 7, col: 4, hint: 'movie series featuring a goldbergian psychopath', num: 10, dir: 'down'},
-                {row: 7, col: 7, hint: 'shoot the breeze', num: 11, dir: 'down'},
-                {row: 9, col: 7, hint: 'cougar, mountain lion', num: 12, dir: 'across'},
-                {row: 11, col: 3, hint: 'internet provocateur', num: 13, dir: 'across'},
-                {row: 10, col: 5, hint: 'Shrek and friends', num: 14, dir: 'down'}
+                {row: 0, col: 0, hint: 'Rare metal', num: 1, dir: 'down'},
+                {row: 1, col: 0, hint: 'First entry in any encyclopedia', num: 2, dir: 'across'},
+                {row: 1, col: 2, hint: 'To concrete structures as bones are to bodies', num: 3, dir: 'down'},
+                {row: 1, col: 4, hint: 'Small rodent that rhymes with its more popular cousin', num: 4, dir: 'down'},
+                {row: 3, col: 4, hint: 'What holds dem bones together', num: 5, dir: 'across'},
+                {row: 4, col: 0, hint: 'Huey, Dewey, Louie, but not Daisy', num: 6, dir: 'across'},
+                {row: 3, col: 6, hint: 'Cheap wine', num: 7, dir: 'down'},
+                {row: 3, col: 10, hint: 'Home for Peter and pirates', num: 8, dir: 'down'},
+                {row: 5, col: 9, hint: 'Always', num: 9, dir: 'across'},
+                {row: 7, col: 4, hint: 'Something for settling', num: 10, dir: 'across'},
+                {row: 7, col: 4, hint: 'Movie series featuring a Goldbergian psychopath', num: 10, dir: 'down'},
+                {row: 7, col: 7, hint: 'Shoot the breeze', num: 11, dir: 'down'},
+                {row: 9, col: 7, hint: 'Cougar, mountain lion, ...', num: 12, dir: 'across'},
+                {row: 10, col: 10, hint: 'Santa tracking entity', num: 13, dir: 'across'},
+                {row: 11, col: 3, hint: 'Internet provocateur', num: 14, dir: 'across'},
+                {row: 10, col: 5, hint: 'Shrek and friends', num: 15, dir: 'down'}
             ];
 
             let startSquares = [];
@@ -129,6 +130,7 @@
                             } else {
                                 context.fillStyle = 'black';
                             }
+
                             context.font = '16pt monospace';
                             context.fontWeight = 'bold';
                             const metrics = context.measureText(ch);
@@ -315,7 +317,7 @@
             function findNextUnfilled() {
                 if (currentWordDir == 'across') {
                     let newCol = focusCol;
-                    while (newCol < NUM_COLS - 1) {
+                    while (newCol < NUM_COLS) {
                         const val = getCellValue(focusRow, newCol);
                         if (val == '_') {
                             // No more blanks remaining
@@ -329,7 +331,7 @@
                     }
                 } else {
                     let newRow = focusRow;
-                    while (newRow < NUM_ROWS - 1) {
+                    while (newRow < NUM_ROWS) {
                         const val = getCellValue(newRow, focusCol);
                         if (val == '_') {
                             // No more blanks remaining
