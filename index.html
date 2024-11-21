@@ -1,12 +1,15 @@
 <html>
     <head>
         <script>
+            'use strict';
+
             let NUM_ROWS = 16;
             let NUM_COLS = 16;
 
             let canvas = null;
             let context = null;
 
+            let showMistakes = true;
             let puzzleAnswers =
                 'v_______________' +
                 'aardvark________' +
@@ -80,6 +83,10 @@
                     val + puzzleData.slice(offset + 1);
             }
 
+            function getExpectedValue(row, col) {
+                return puzzleAnswers[row * NUM_COLS + col];
+            }
+
             function render() {
                 const CELL_WIDTH = canvas.width / NUM_COLS;
                 const CELL_HEIGHT = (canvas.height - 20) / NUM_ROWS;
@@ -127,7 +134,11 @@
                                                  CELL_WIDTH, CELL_HEIGHT);
                             }
 
-                            context.fillStyle = 'black';
+                            if (showMistakes && getExpectedValue(rowi, coli).toUpperCase() != ch) {
+                                context.fillStyle = 'red';
+                            } else {
+                                context.fillStyle = 'black';
+                            }
                             context.font = '20pt sans-serif';
                             context.fontWeight = 'bold';
                             const metrics = context.measureText(ch);
@@ -140,6 +151,7 @@
 
                             const startNum = startSquares[rowi * NUM_COLS + coli];
                             if (startNum != -1) {
+                                context.fillStyle = 'black';
                                 context.font = '10px sans-serif';
                                 context.fontWeight = 'normal';
                                 context.fillText(startNum.toString(), coli * CELL_WIDTH + 2,
