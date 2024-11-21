@@ -3,54 +3,58 @@
         <script>
             'use strict';
 
-            let NUM_ROWS = 15;
-            let NUM_COLS = 15;
+
+            const PUZZLE_DATA = {
+                "numRows": 15,
+                "numCols": 15,
+                "answers": "v______________" +
+                    "aardvark_______" +
+                    "n_e_o__________" +
+                    "a_b_ligaments__" +
+                    "drake_a___e____" +
+                    "i_r___l__ever__" +
+                    "u_____l___e____" +
+                    "m___score_r____" +
+                    "____a__a__l____" +
+                    "____w__puma____" +
+                    "_____o____norad" +
+                    "___edgelord____" +
+                    "_____r_________" +
+                    "_____e_________" +
+                    "_____s_________",
+                "clues": [
+                    {"row": 0, "col": 0, "hint": "Rare metal", "num": 1, "dir": "down"},
+                    {"row": 1, "col": 0, "hint": "First entry in any encyclopedia", "num": 2, "dir": "across"},
+                    {"row": 1, "col": 2, "hint": "To concrete structures as bones are to bodies", "num": 3, "dir": "down"},
+                    {"row": 1, "col": 4, "hint": "Small rodent that rhymes with its more popular cousin", "num": 4, "dir": "down"},
+                    {"row": 3, "col": 4, "hint": "What holds dem bones together", "num": 5, "dir": "across"},
+                    {"row": 4, "col": 0, "hint": "Huey, Dewey, Louie, but not Daisy", "num": 6, "dir": "across"},
+                    {"row": 3, "col": 6, "hint": "Cheap wine", "num": 7, "dir": "down"},
+                    {"row": 3, "col": 10, "hint": "Home for Peter and pirates", "num": 8, "dir": "down"},
+                    {"row": 5, "col": 9, "hint": "Always", "num": 9, "dir": "across"},
+                    {"row": 7, "col": 4, "hint": "Something for settling", "num": 10, "dir": "across"},
+                    {"row": 7, "col": 4, "hint": "Movie series featuring a Goldbergian psychopath", "num": 10, "dir": "down"},
+                    {"row": 7, "col": 7, "hint": "Shoot the breeze", "num": 11, "dir": "down"},
+                    {"row": 9, "col": 7, "hint": "Cougar, mountain lion, ...", "num": 12, "dir": "across"},
+                    {"row": 10, "col": 10, "hint": "Santa tracking entity", "num": 13, "dir": "across"},
+                    {"row": 11, "col": 3, "hint": "Internet provocateur", "num": 14, "dir": "across"},
+                    {"row": 10, "col": 5, "hint": "Shrek and friends", "num": 15, "dir": "down"}
+                ]
+            };
+
+            const CLUE_HEIGHT = 15;
+
+            let numRows = 0;
+            let numCols = 0;
             let cellWidth = 0;
             let cellHeight = 0;
             let solved = false;
-
             let canvas = null;
             let context = null;
-
             let showMistakes = true;
-            let puzzleAnswers =
-                'v______________' +
-                'aardvark_______' +
-                'n_e_o__________' +
-                'a_b_ligaments__' +
-                'drake_a___e____' +
-                'i_r___l__ever__' +
-                'u_____l___e____' +
-                'm___score_r____' +
-                '____a__a__l____' +
-                '____w__puma____' +
-                '_____o____norad' +
-                '___edgelord____' +
-                '_____r_________' +
-                '_____e_________' +
-                '_____s_________';
-
-            let puzzleData = puzzleAnswers.replaceAll(/[^_]/gi, ' ');
-
-            let clues = [
-                {row: 0, col: 0, hint: 'Rare metal', num: 1, dir: 'down'},
-                {row: 1, col: 0, hint: 'First entry in any encyclopedia', num: 2, dir: 'across'},
-                {row: 1, col: 2, hint: 'To concrete structures as bones are to bodies', num: 3, dir: 'down'},
-                {row: 1, col: 4, hint: 'Small rodent that rhymes with its more popular cousin', num: 4, dir: 'down'},
-                {row: 3, col: 4, hint: 'What holds dem bones together', num: 5, dir: 'across'},
-                {row: 4, col: 0, hint: 'Huey, Dewey, Louie, but not Daisy', num: 6, dir: 'across'},
-                {row: 3, col: 6, hint: 'Cheap wine', num: 7, dir: 'down'},
-                {row: 3, col: 10, hint: 'Home for Peter and pirates', num: 8, dir: 'down'},
-                {row: 5, col: 9, hint: 'Always', num: 9, dir: 'across'},
-                {row: 7, col: 4, hint: 'Something for settling', num: 10, dir: 'across'},
-                {row: 7, col: 4, hint: 'Movie series featuring a Goldbergian psychopath', num: 10, dir: 'down'},
-                {row: 7, col: 7, hint: 'Shoot the breeze', num: 11, dir: 'down'},
-                {row: 9, col: 7, hint: 'Cougar, mountain lion, ...', num: 12, dir: 'across'},
-                {row: 10, col: 10, hint: 'Santa tracking entity', num: 13, dir: 'across'},
-                {row: 11, col: 3, hint: 'Internet provocateur', num: 14, dir: 'across'},
-                {row: 10, col: 5, hint: 'Shrek and friends', num: 15, dir: 'down'}
-            ];
-
+            let answerSquares = '';
+            let clues = [];
+            let currentSquares = '';
             let startSquares = [];
             let focusRow = 0;
             let focusCol = 0;
@@ -62,36 +66,44 @@
             function init() {
                 canvas = document.getElementById('c');
                 context = canvas.getContext('2d');
+                document.onkeydown = handleKeyDown;
+                document.onmousedown = handleMouseDown;
+                loadPuzzle(PUZZLE_DATA);
+            }
 
-                cellWidth = Math.floor(canvas.width / NUM_COLS);
-                cellHeight = Math.floor((canvas.height - 15) / NUM_ROWS);
+            function loadPuzzle(puzzle) {
+                numRows = puzzle.numRows;
+                numCols = puzzle.numCols;
+                cellWidth = Math.floor(canvas.width / numCols);
+                cellHeight = Math.floor((canvas.height - CLUE_HEIGHT) / numRows);
+                answerSquares = puzzle.answers;
+                currentSquares = answerSquares.replaceAll(/[^_]/gi, ' ');
 
-                // Set up startSquares array
-                for (let i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+                startSquares = [];
+                for (let i = 0; i < numRows * numCols; i++) {
                     startSquares.push(-1);
                 }
 
-                for (const clue of clues) {
-                    startSquares[clue.row * NUM_COLS + clue.col] = clue.num;
+                clues = puzzle.clues;
+                for (const clue of puzzle.clues) {
+                    startSquares[clue.row * numCols + clue.col] = clue.num;
                 }
 
-                document.onkeydown = handleKeyDown;
-                document.onmousedown = handleMouseDown;
                 updateFocus();
             }
 
             function getCellValue(row, col) {
-                return puzzleData[row * NUM_COLS + col];
+                return currentSquares[row * numCols + col];
             }
 
             function setCellValue(row, col, val) {
-                const offset = focusRow * NUM_COLS + focusCol;
-                puzzleData = puzzleData.slice(0, offset) +
-                    val + puzzleData.slice(offset + 1);
+                const offset = focusRow * numCols + focusCol;
+                currentSquares = currentSquares.slice(0, offset) +
+                    val + currentSquares.slice(offset + 1);
             }
 
             function getExpectedValue(row, col) {
-                return puzzleAnswers[row * NUM_COLS + col];
+                return answerSquares[row * numCols + col];
             }
 
             function render() {
@@ -111,8 +123,8 @@
                     }
                 }
 
-                for (let rowi = 0; rowi < NUM_ROWS; rowi++) {
-                    for (let coli = 0; coli < NUM_COLS; coli++) {
+                for (let rowi = 0; rowi < numRows; rowi++) {
+                    for (let coli = 0; coli < numCols; coli++) {
                         const ch = getCellValue(rowi, coli).toUpperCase();
                         if (ch == '_') {
                             context.fillStyle = 'black';
@@ -141,7 +153,7 @@
                                             metrics.fontBoundingBoxAscent;
                             context.fillText(ch, x, y);
 
-                            const startNum = startSquares[rowi * NUM_COLS + coli];
+                            const startNum = startSquares[rowi * numCols + coli];
                             if (startNum != -1) {
                                 context.fillStyle = 'black';
                                 context.font = '8pt monospace';
@@ -165,16 +177,16 @@
                 context.beginPath();
                 context.strokeStyle = 'gray';
                 context.lineWidth = 1;
-                for (let rowi = 0; rowi <= NUM_ROWS; rowi++) {
+                for (let rowi = 0; rowi <= numRows; rowi++) {
                     const y = cellHeight * rowi;
                     context.moveTo(0, y);
-                    context.lineTo(NUM_COLS * cellWidth, y);
+                    context.lineTo(numCols * cellWidth, y);
                 }
 
-                for (let coli = 0; coli <= NUM_COLS; coli++) {
+                for (let coli = 0; coli <= numCols; coli++) {
                     const x = cellWidth * coli;
                     context.moveTo(x, 0);
-                    context.lineTo(x, NUM_ROWS * cellHeight);
+                    context.lineTo(x, numRows * cellHeight);
                 }
 
                 context.stroke();
@@ -186,7 +198,7 @@
             }
 
             function navigateRight() {
-                for (let i = focusCol + 1; i < NUM_COLS; i++) {
+                for (let i = focusCol + 1; i < numCols; i++) {
                     if (getCellValue(focusRow, i) != '_') {
                         focusCol = i;
                         updateFocus();
@@ -216,7 +228,7 @@
             }
 
             function navigateDown() {
-                for (let i = focusRow + 1; i < NUM_ROWS; i++) {
+                for (let i = focusRow + 1; i < numRows; i++) {
                     if (getCellValue(i, focusCol) != '_') {
                         focusRow = i;
                         updateFocus();
@@ -282,7 +294,7 @@
                 findNextUnfilled();
                 updateFocus();
 
-                if (puzzleAnswers == puzzleData) {
+                if (answerSquares == currentSquares) {
                     solved = true;
                     render();
                 }
@@ -317,7 +329,7 @@
             function findNextUnfilled() {
                 if (currentWordDir == 'across') {
                     let newCol = focusCol;
-                    while (newCol < NUM_COLS) {
+                    while (newCol < numCols) {
                         const val = getCellValue(focusRow, newCol);
                         if (val == '_') {
                             // No more blanks remaining
@@ -331,7 +343,7 @@
                     }
                 } else {
                     let newRow = focusRow;
-                    while (newRow < NUM_ROWS) {
+                    while (newRow < numRows) {
                         const val = getCellValue(newRow, focusCol);
                         if (val == '_') {
                             // No more blanks remaining
@@ -353,8 +365,8 @@
 
                 const clickCol = Math.floor(event.x / cellWidth);
                 const clickRow = Math.floor(event.y / cellHeight);
-                if (clickCol >= 0 && clickCol < NUM_COLS && clickRow >= 0 && clickRow < NUM_ROWS) {
-                    if (puzzleData[clickRow * NUM_COLS + clickCol] != '_') {
+                if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
+                    if (currentSquares[clickRow * numCols + clickCol] != '_') {
                         focusRow = clickRow;
                         focusCol = clickCol;
                         updateFocus();
@@ -369,7 +381,7 @@
                 }
 
                 let right = focusCol;
-                while (right < NUM_COLS - 1 && getCellValue(focusRow, right + 1) != '_') {
+                while (right < numCols - 1 && getCellValue(focusRow, right + 1) != '_') {
                     right++;
                 }
 
@@ -379,7 +391,7 @@
                 }
 
                 let bottom = focusRow;
-                while (bottom < NUM_ROWS - 1 && getCellValue(bottom + 1, focusCol) != '_') {
+                while (bottom < numRows - 1 && getCellValue(bottom + 1, focusCol) != '_') {
                     bottom++;
                 }
 
