@@ -5,6 +5,8 @@
 
             let NUM_ROWS = 16;
             let NUM_COLS = 16;
+            let cellWidth = 0;
+            let cellHeight = 0;
 
             let canvas = null;
             let context = null;
@@ -50,11 +52,14 @@
             let currentWordStart = 0;
             let currentWordEnd = 0;
             let currentWordDir = 'down';
-            let currentClue = -1;
+            let currentClue = 0;
 
             function init() {
                 canvas = document.getElementById('c');
                 context = canvas.getContext('2d');
+
+                cellWidth = Math.floor(canvas.width / NUM_COLS);
+                cellHeight = Math.floor((canvas.height - 15) / NUM_ROWS);
 
                 // Set up startSquares array
                 for (let i = 0; i < NUM_ROWS * NUM_COLS; i++) {
@@ -62,15 +67,12 @@
                 }
 
                 for (const clue of clues) {
-                    console.log(clue);
                     startSquares[clue.row * NUM_COLS + clue.col] = clue.num;
                 }
 
-                console.log(startSquares);
-
                 document.onkeydown = handleKeyDown;
                 document.onmousedown = handleMouseDown;
-                render();
+                updateFocus();
             }
 
             function getCellValue(row, col) {
@@ -88,50 +90,32 @@
             }
 
             function render() {
-                const CELL_WIDTH = canvas.width / NUM_COLS;
-                const CELL_HEIGHT = (canvas.height - 20) / NUM_ROWS;
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Draw focus highlight
-                context.fillStyle = '#c0c0f0';
+                context.fillStyle = '#b2bfdd';
                 if (currentWordDir == 'across') {
-                    context.fillRect(currentWordStart * CELL_WIDTH, focusRow * CELL_HEIGHT,
-                                    (currentWordEnd - currentWordStart + 1) * CELL_WIDTH,
-                                    CELL_HEIGHT);
+                    context.fillRect(currentWordStart * cellWidth, focusRow * cellHeight,
+                                    (currentWordEnd - currentWordStart + 1) * cellWidth,
+                                    cellHeight);
                 } else {
-                    context.fillRect(focusCol * CELL_WIDTH, currentWordStart * CELL_HEIGHT,
-                                    CELL_WIDTH,
-                                    (currentWordEnd - currentWordStart + 1) * CELL_HEIGHT);
+                    context.fillRect(focusCol * cellWidth, currentWordStart * cellHeight,
+                                    cellWidth,
+                                    (currentWordEnd - currentWordStart + 1) * cellHeight);
                 }
-
-                context.strokeStyle = 'gray';
-                context.lineWidth = '1px';
-                for (let rowi = 0; rowi <= NUM_ROWS; rowi++) {
-                    const y = CELL_HEIGHT * rowi;
-                    context.moveTo(0, y);
-                    context.lineTo(NUM_COLS * CELL_WIDTH, y);
-                }
-
-                for (let coli = 0; coli <= NUM_COLS; coli++) {
-                    const x = CELL_WIDTH * coli;
-                    context.moveTo(x, 0);
-                    context.lineTo(x, NUM_ROWS * CELL_HEIGHT);
-                }
-
-                context.stroke();
 
                 for (let rowi = 0; rowi < NUM_ROWS; rowi++) {
                     for (let coli = 0; coli < NUM_COLS; coli++) {
                         const ch = getCellValue(rowi, coli).toUpperCase();
                         if (ch == '_') {
                             context.fillStyle = 'black';
-                            context.fillRect(coli * CELL_WIDTH, rowi * CELL_HEIGHT,
-                                             CELL_WIDTH, CELL_HEIGHT);
+                            context.fillRect(coli * cellWidth, rowi * cellHeight,
+                                             cellWidth, cellHeight);
                         } else {
                             if (rowi == focusRow && coli == focusCol) {
-                                context.fillStyle = '#ffff6e';
-                                context.fillRect(coli * CELL_WIDTH, rowi * CELL_HEIGHT,
-                                                 CELL_WIDTH, CELL_HEIGHT);
+                                context.fillStyle = '#596fa1';
+                                context.fillRect(coli * cellWidth, rowi * cellHeight,
+                                                 cellWidth, cellHeight);
                             }
 
                             if (showMistakes && getExpectedValue(rowi, coli).toUpperCase() != ch) {
@@ -142,10 +126,10 @@
                             context.font = '20pt sans-serif';
                             context.fontWeight = 'bold';
                             const metrics = context.measureText(ch);
-                            const x = coli * CELL_WIDTH + (CELL_WIDTH - metrics.width) / 2;
+                            const x = coli * cellWidth + (cellWidth - metrics.width) / 2;
                             const glyphHeight = metrics.fontBoundingBoxAscent +
                                                 metrics.fontBoundingBoxDescent;
-                            const y = rowi * CELL_HEIGHT + (CELL_HEIGHT - glyphHeight) / 2 +
+                            const y = rowi * cellHeight + (cellHeight - glyphHeight) / 2 +
                                             metrics.fontBoundingBoxAscent;
                             context.fillText(ch, x, y);
 
@@ -154,8 +138,8 @@
                                 context.fillStyle = 'black';
                                 context.font = '10px sans-serif';
                                 context.fontWeight = 'normal';
-                                context.fillText(startNum.toString(), coli * CELL_WIDTH + 2,
-                                                 rowi * CELL_HEIGHT + 10);
+                                context.fillText(startNum.toString(), coli * cellWidth + 2,
+                                                 rowi * cellHeight + 10);
                             }
                         }
                     }
@@ -168,6 +152,24 @@
                     const clue = clues[currentClue];
                     context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
                 }
+
+                // Draw grid
+                context.beginPath();
+                context.strokeStyle = 'gray';
+                context.lineWidth = 1;
+                for (let rowi = 0; rowi <= NUM_ROWS; rowi++) {
+                    const y = cellHeight * rowi;
+                    context.moveTo(0, y);
+                    context.lineTo(NUM_COLS * cellWidth, y);
+                }
+
+                for (let coli = 0; coli <= NUM_COLS; coli++) {
+                    const x = cellWidth * coli;
+                    context.moveTo(x, 0);
+                    context.lineTo(x, NUM_ROWS * cellHeight);
+                }
+
+                context.stroke();
             }
 
             function updateFocus() {
@@ -328,10 +330,8 @@
             }
 
             function handleMouseDown(event) {
-                const CELL_WIDTH = canvas.width / NUM_COLS;
-                const CELL_HEIGHT = (canvas.height - 15) / NUM_ROWS;
-                const clickCol = Math.floor(event.x / CELL_WIDTH);
-                const clickRow = Math.floor(event.y / CELL_HEIGHT);
+                const clickCol = Math.floor(event.x / cellWidth);
+                const clickRow = Math.floor(event.y / cellHeight);
                 if (clickCol >= 0 && clickCol < NUM_COLS && clickRow >= 0 && clickRow < NUM_ROWS) {
                     if (puzzleData[clickRow * NUM_COLS + clickCol] != '_') {
                         focusRow = clickRow;
