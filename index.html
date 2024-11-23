@@ -14,6 +14,34 @@
             #cluelist {
                 margin-left: 8px;
             }
+
+            .modal-scrim {
+                display: none; /* Initially hidden */
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 100%;
+            }
+
+            .modal-content {
+                position: relative;
+                margin-top: 25%;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 16px;
+                border: 4px solid black;
+                width: 40%;
+                height: 25%;
+                background-color: white;
+            }
+
+            .modal-close {
+                float: right;
+                font-size: 30px;
+                font-weight: bold;
+            }
         </style>
         <script>
             'use strict';
@@ -48,6 +76,11 @@
                     showMistakes = mistakeCheckBox.checked;
                     drawPuzzleGrid();
                 };
+
+                document.getElementById("close").onclick = (event) => {
+                    document.getElementById('successmsg').style.display = 'none';
+                };
+
                 fetch('puzzle.json').then((response) => {
                     return response.json();
                 }).then((puzzleData) => {
@@ -306,8 +339,13 @@
 
                 if (answerSquares == currentSquares) {
                     solved = true;
+                    displaySuccessMessage();
                     drawPuzzleGrid();
                 }
+            }
+
+            function displaySuccessMessage() {
+                document.getElementById('successmsg').style.display = 'block';
             }
 
             function swapHighlightDirection() {
@@ -467,5 +505,12 @@
         </div>
         <input type="checkbox" id="showmistakes" name="showmistakes">
         <label for="showmistakes">Show Mistakes</label>
+
+        <div id="successmsg" class="modal-scrim">
+            <div class="modal-content">
+                Nice work!
+                <span class="modal-close" id="close">&times;</span>
+            </div>
+        </div>
     </body>
 </html>
