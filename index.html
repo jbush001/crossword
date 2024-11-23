@@ -13,6 +13,11 @@
 
             #cluelist {
                 margin-left: 8px;
+                font-size: 16pt;
+                user-select: none;
+                width: 300px;
+                height: 600px; /* Hack, same as canvas below */
+                overflow-y: auto;
             }
 
             .modal-scrim {
@@ -478,20 +483,20 @@
                 currentClue = -1;
                 for (let i = 0; i < clues.length; i++) {
                     const clue = clues[i];
-                    if (currentWordDir == 'down') {
-                        if (clue.dir == 'down' && clue.col == focusCol && clue.row == currentWordStart) {
-                            clue.element.style.backgroundColor = 'lightblue';
-                            lastBoldedClueDiv = clue.element;
-                            currentClue = i;
-                            break;
-                        }
-                    } else {
-                        if (clue.dir == 'across' && clue.row == focusRow && clue.col == currentWordStart) {
-                            clue.element.style.backgroundColor = 'lightblue';
-                            lastBoldedClueDiv = clue.element;
-                            currentClue = i;
-                            break;
-                        }
+                    const downMatch = currentWordDir == 'down' &&
+                        clue.dir == 'down' &&
+                        clue.col == focusCol &&
+                        clue.row == currentWordStart;
+                    const acrossMatch = currentWordDir == 'across' &&
+                        clue.dir == 'across' &&
+                        clue.row == focusRow &&
+                        clue.col == currentWordStart;
+                    if (downMatch || acrossMatch) {
+                        clue.element.style.backgroundColor = 'lightblue';
+                        lastBoldedClueDiv = clue.element;
+                        clue.element.scrollIntoView({block: 'nearest'});
+                        currentClue = i;
+                        break;
                     }
                 }
             }
