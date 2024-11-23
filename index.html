@@ -7,6 +7,12 @@
 
             #title {
                 font-weight: bold;
+                font-size: 16pt;
+                margin-bottom: 8px;
+            }
+
+            #cluelist {
+                margin-left: 8px;
             }
         </style>
         <script>
@@ -19,7 +25,7 @@
             let solved = false;
             let canvas = null;
             let context = null;
-            let showMistakes = true;
+            let showMistakes = false;
             let answerSquares = '';
             let clues = [];
             let currentSquares = '';
@@ -37,6 +43,11 @@
                 context = canvas.getContext('2d');
                 document.onkeydown = handleKeyDown;
                 document.onmousedown = handleMouseDown;
+                const mistakeCheckBox = document.getElementById('showmistakes');
+                mistakeCheckBox.onchange = (event) => {
+                    showMistakes = mistakeCheckBox.checked;
+                    render();
+                };
                 fetch('puzzle.json').then((response) => {
                     return response.json();
                 }).then((puzzleData) => {
@@ -448,5 +459,7 @@
             <canvas id="c" width="600" height="600"></canvas>
             <div id="cluelist"></div>
         </div>
+        <input type="checkbox" id="showmistakes" name="showmistakes">
+        <label for="showmistakes">Show Mistakes</label>
     </body>
 </html>
