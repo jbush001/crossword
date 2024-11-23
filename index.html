@@ -261,10 +261,9 @@
                         break;
                     case 'Tab':
                         event.preventDefault();
-                        currentClue++;
-                        if (currentClue >= clues.length) {
-                            currentClue = 0;
-                        }
+                        currentClue = (currentClue +
+                            (event.shiftKey ? (clues.length - 1) : 1)) %
+                            clues.length;
 
                         focusRow = clues[currentClue].row;
                         focusCol = clues[currentClue].col;
