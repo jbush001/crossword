@@ -1,8 +1,12 @@
 <html>
     <head>
+        <style>
+            #top {
+                display: flex;
+            }
+        </style>
         <script>
             'use strict';
-
 
             const PUZZLE_DATA = {
                 "numRows": 15,
@@ -42,8 +46,6 @@
                 ]
             };
 
-            const CLUE_HEIGHT = 15;
-
             let numRows = 0;
             let numCols = 0;
             let cellWidth = 0;
@@ -62,6 +64,7 @@
             let currentWordEnd = 0;
             let currentWordDir = 'down';
             let currentClue = 0;
+            let lastBoldedClueDiv = null;
 
             function init() {
                 canvas = document.getElementById('c');
@@ -75,7 +78,7 @@
                 numRows = puzzle.numRows;
                 numCols = puzzle.numCols;
                 cellWidth = Math.floor(canvas.width / numCols);
-                cellHeight = Math.floor((canvas.height - CLUE_HEIGHT) / numRows);
+                cellHeight = Math.floor(canvas.height / numRows);
                 answerSquares = puzzle.answers;
                 currentSquares = answerSquares.replaceAll(/[^_]/gi, ' ');
 
@@ -87,6 +90,23 @@
                 clues = puzzle.clues;
                 for (const clue of puzzle.clues) {
                     startSquares[clue.row * numCols + clue.col] = clue.num;
+                }
+
+                // Populate the clue list
+                const clueList = document.getElementById('cluelist');
+                for (const dir of ['across', 'down']) {
+                    const elem = document.createElement('div');
+                    elem.innerText = dir.toUpperCase();
+                    clueList.appendChild(elem);
+
+                    for (const clue of clues) {
+                        if (clue.dir == dir) {
+                            const elem = document.createElement('div');
+                            elem.innerText = clue.num + '. ' + clue.hint;
+                            clueList.appendChild(elem);
+                            clue.element = elem;
+                        }
+                    }
                 }
 
                 updateFocus();
@@ -182,14 +202,6 @@
                             }
                         }
                     }
-                }
-
-                // Draw the clue
-                if (!solved) {
-                    context.fillStyle = 'black';
-                    context.font = '12pt monospace';
-                    const clue = clues[currentClue];
-                    context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
                 }
             }
 
@@ -423,16 +435,25 @@
             }
 
             function findCurrentClue() {
+                if (lastBoldedClueDiv !== null) {
+                    lastBoldedClueDiv.style.fontWeight = 'normal';
+                    lastBoldedClueDiv = null;
+                }
+
                 currentClue = -1;
                 for (let i = 0; i < clues.length; i++) {
                     const clue = clues[i];
                     if (currentWordDir == 'down') {
                         if (clue.dir == 'down' && clue.col == focusCol && clue.row == currentWordStart) {
+                            clue.element.style.fontWeight = 'bold';
+                            lastBoldedClueDiv = clue.element;
                             currentClue = i;
                             break;
                         }
                     } else {
                         if (clue.dir == 'across' && clue.row == focusRow && clue.col == currentWordStart) {
+                            clue.element.style.fontWeight = 'bold';
+                            lastBoldedClueDiv = clue.element;
                             currentClue = i;
                             break;
                         }
@@ -442,7 +463,9 @@
         </script>
     </head>
     <body onload="init()">
-        <canvas id="c" width="600" height="620"></canvas>
-        <div id="hint"></div>
+        <div id="top">
+            <canvas id="c" width="600" height="600"></canvas>
+            <div id="cluelist"></div>
+        </div>
     </body>
 </html>
