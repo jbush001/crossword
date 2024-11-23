@@ -61,9 +61,9 @@
                 // Populate the clue list
                 const clueList = document.getElementById('cluelist');
                 for (const dir of ['across', 'down']) {
-                    const elem = document.createElement('div');
-                    elem.innerText = dir.toUpperCase();
-                    clueList.appendChild(elem);
+                    const header = document.createElement('div');
+                    header.innerHTML = '<b>' + dir.toUpperCase() + '<b>';
+                    clueList.appendChild(header);
 
                     for (const clue of clues) {
                         if (clue.dir == dir) {
@@ -71,14 +71,26 @@
                             elem.innerText = clue.num + '. ' + clue.hint;
                             clueList.appendChild(elem);
                             clue.element = elem;
+                            elem.onclick = (event) => {
+                                // Jump to this clue
+                                focusRow = clue.row;
+                                focusCol = clue.col;
+                                currentWordDir = clue.dir;
+                                updateFocus();
+                            };
                         }
                     }
+
+                    // Spacer
+                    const spacer = document.createElement('div');
+                    spacer.innerHTML = '<br/>';
+                    clueList.appendChild(spacer);
                 }
 
+                // Select firts clue
                 focusRow = clues[0].row;
                 focusCol = clues[0].col;
                 currentWordDir = clues[0].dir;
-
                 updateFocus();
             }
 
@@ -406,7 +418,7 @@
 
             function findCurrentClue() {
                 if (lastBoldedClueDiv !== null) {
-                    lastBoldedClueDiv.style.fontWeight = 'normal';
+                    lastBoldedClueDiv.style.backgroundColor = 'transparent';
                     lastBoldedClueDiv = null;
                 }
 
@@ -415,14 +427,14 @@
                     const clue = clues[i];
                     if (currentWordDir == 'down') {
                         if (clue.dir == 'down' && clue.col == focusCol && clue.row == currentWordStart) {
-                            clue.element.style.fontWeight = 'bold';
+                            clue.element.style.backgroundColor = 'lightblue';
                             lastBoldedClueDiv = clue.element;
                             currentClue = i;
                             break;
                         }
                     } else {
                         if (clue.dir == 'across' && clue.row == focusRow && clue.col == currentWordStart) {
-                            clue.element.style.fontWeight = 'bold';
+                            clue.element.style.backgroundColor = 'lightblue';
                             lastBoldedClueDiv = clue.element;
                             currentClue = i;
                             break;
