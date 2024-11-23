@@ -4,6 +4,10 @@
             #top {
                 display: flex;
             }
+
+            #title {
+                font-weight: bold;
+            }
         </style>
         <script>
             'use strict';
@@ -41,6 +45,8 @@
             }
 
             function loadPuzzle(puzzle) {
+                document.getElementById('title').innerText = puzzle.title;
+
                 numRows = puzzle.numRows;
                 numCols = puzzle.numCols;
                 cellWidth = Math.floor(canvas.width / numCols);
@@ -111,18 +117,16 @@
             function render() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Highlight the word that is currently being solved.
-                if (!solved) {
-                    context.fillStyle = '#b2bfdd';
-                    if (currentWordDir == 'across') {
-                        context.fillRect(currentWordStart * cellWidth, focusRow * cellHeight,
-                                        (currentWordEnd - currentWordStart + 1) * cellWidth,
-                                        cellHeight);
-                    } else {
-                        context.fillRect(focusCol * cellWidth, currentWordStart * cellHeight,
-                                        cellWidth,
-                                        (currentWordEnd - currentWordStart + 1) * cellHeight);
-                    }
+                // Highlight the word that the cursor is currently in.
+                context.fillStyle = '#b2bfdd';
+                if (currentWordDir == 'across') {
+                    context.fillRect(currentWordStart * cellWidth, focusRow * cellHeight,
+                                    (currentWordEnd - currentWordStart + 1) * cellWidth,
+                                    cellHeight);
+                } else {
+                    context.fillRect(focusCol * cellWidth, currentWordStart * cellHeight,
+                                    cellWidth,
+                                    (currentWordEnd - currentWordStart + 1) * cellHeight);
                 }
 
                 // Draw grid
@@ -153,7 +157,7 @@
                             context.fillRect(coli * cellWidth, rowi * cellHeight,
                                              cellWidth, cellHeight);
                         } else {
-                            if (rowi == focusRow && coli == focusCol && !solved) {
+                            if (rowi == focusRow && coli == focusCol) {
                                     context.fillStyle = '#596fa1';
                                 context.fillRect(coli * cellWidth, rowi * cellHeight,
                                                  cellWidth, cellHeight);
@@ -233,10 +237,6 @@
             }
 
             function handleKeyDown(event) {
-                if (solved) {
-                    return;
-                }
-
                 switch (event.key) {
                     case 'ArrowDown':
                         navigateDown();
@@ -267,10 +267,12 @@
                         render();
                         break;
                     case 'Backspace':
-                        backspace();
+                        if (!solved) {
+                            backspace();
+                        }
                         break;
                     default: {
-                        if (event.key.length == 1) {
+                        if (!solved && event.key.length == 1) {
                             const code = event.key.charCodeAt(0);
                             if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
                                 (code > 96 && code < 123)) {
@@ -353,10 +355,6 @@
             }
 
             function handleMouseDown(event) {
-                if (solved) {
-                    return;
-                }
-
                 const clickCol = Math.floor(event.x / cellWidth);
                 const clickRow = Math.floor(event.y / cellHeight);
                 if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
@@ -445,6 +443,7 @@
         </script>
     </head>
     <body onload="init()">
+        <div id="title"></div>
         <div id="top">
             <canvas id="c" width="600" height="600"></canvas>
             <div id="cluelist"></div>
