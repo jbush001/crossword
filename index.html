@@ -8,44 +8,6 @@
         <script>
             'use strict';
 
-            const PUZZLE_DATA = {
-                "numRows": 15,
-                "numCols": 15,
-                "answers": "v______________" +
-                    "aardvark_______" +
-                    "n_e_o__________" +
-                    "a_b_ligaments__" +
-                    "drake_a___e____" +
-                    "i_r___l__ever__" +
-                    "u_____l___e____" +
-                    "m___score_r____" +
-                    "____a__a__l____" +
-                    "____w__puma____" +
-                    "_____o____norad" +
-                    "___edgelord____" +
-                    "_____r_________" +
-                    "_____e_________" +
-                    "_____s_________",
-                "clues": [
-                    {"row": 0, "col": 0, "hint": "Rare metal", "num": 1, "dir": "down"},
-                    {"row": 1, "col": 0, "hint": "First entry in any encyclopedia", "num": 2, "dir": "across"},
-                    {"row": 1, "col": 2, "hint": "To concrete structures as bones are to bodies", "num": 3, "dir": "down"},
-                    {"row": 1, "col": 4, "hint": "Small rodent that rhymes with its more popular cousin", "num": 4, "dir": "down"},
-                    {"row": 3, "col": 4, "hint": "What holds dem bones together", "num": 5, "dir": "across"},
-                    {"row": 4, "col": 0, "hint": "Huey, Dewey, Louie, but not Daisy", "num": 6, "dir": "across"},
-                    {"row": 3, "col": 6, "hint": "Cheap wine", "num": 7, "dir": "down"},
-                    {"row": 3, "col": 10, "hint": "Home for Peter and pirates", "num": 8, "dir": "down"},
-                    {"row": 5, "col": 9, "hint": "Always", "num": 9, "dir": "across"},
-                    {"row": 7, "col": 4, "hint": "Something for settling", "num": 10, "dir": "across"},
-                    {"row": 7, "col": 4, "hint": "Movie series featuring a Goldbergian psychopath", "num": 10, "dir": "down"},
-                    {"row": 7, "col": 7, "hint": "Shoot the breeze", "num": 11, "dir": "down"},
-                    {"row": 9, "col": 7, "hint": "Cougar, mountain lion, ...", "num": 12, "dir": "across"},
-                    {"row": 10, "col": 10, "hint": "Santa tracking entity", "num": 13, "dir": "across"},
-                    {"row": 11, "col": 3, "hint": "Internet provocateur", "num": 14, "dir": "across"},
-                    {"row": 10, "col": 5, "hint": "Shrek and friends", "num": 15, "dir": "down"}
-                ]
-            };
-
             let numRows = 0;
             let numCols = 0;
             let cellWidth = 0;
@@ -71,7 +33,11 @@
                 context = canvas.getContext('2d');
                 document.onkeydown = handleKeyDown;
                 document.onmousedown = handleMouseDown;
-                loadPuzzle(PUZZLE_DATA);
+                fetch('puzzle.json').then((response) => {
+                    return response.json();
+                }).then((puzzleData) => {
+                    loadPuzzle(puzzleData);
+                });
             }
 
             function loadPuzzle(puzzle) {
@@ -79,7 +45,7 @@
                 numCols = puzzle.numCols;
                 cellWidth = Math.floor(canvas.width / numCols);
                 cellHeight = Math.floor(canvas.height / numRows);
-                answerSquares = puzzle.answers;
+                answerSquares = puzzle.answers.replaceAll('\n', '');
                 currentSquares = answerSquares.replaceAll(/[^_]/gi, ' ');
 
                 startSquares = [];
@@ -108,6 +74,10 @@
                         }
                     }
                 }
+
+                focusRow = clues[0].row;
+                focusCol = clues[0].col;
+                currentWordDir = clues[0].dir;
 
                 updateFocus();
             }

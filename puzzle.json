@@ -1,0 +1,23 @@
+{
+    "numRows": 15,
+    "numCols": 15,
+    "answers": "v______________\naardvark_______\nn_e_o__________\na_b_ligaments__\ndrake_a___e____\ni_r___l__ever__\nu_____l___e____\nm___score_r____\n____a__a__l____\n____w__puma____\n_____o____norad\n___edgelord____\n_____r_________\n_____e_________\n_____s_________",
+    "clues": [
+        {"row": 1, "col": 0, "hint": "First entry in any encyclopedia", "num": 2, "dir": "across"},
+        {"row": 3, "col": 4, "hint": "What holds dem bones together", "num": 5, "dir": "across"},
+        {"row": 4, "col": 0, "hint": "Huey, Dewey, Louie, but not Daisy", "num": 6, "dir": "across"},
+        {"row": 5, "col": 9, "hint": "Always", "num": 9, "dir": "across"},
+        {"row": 7, "col": 4, "hint": "Something for settling", "num": 10, "dir": "across"},
+        {"row": 9, "col": 7, "hint": "Cougar, mountain lion, ...", "num": 12, "dir": "across"},
+        {"row": 10, "col": 10, "hint": "Santa tracking entity", "num": 13, "dir": "across"},
+        {"row": 11, "col": 3, "hint": "Internet provocateur", "num": 14, "dir": "across"},
+        {"row": 0, "col": 0, "hint": "Rare metal", "num": 1, "dir": "down"},
+        {"row": 1, "col": 2, "hint": "To concrete structures as bones are to bodies", "num": 3, "dir": "down"},
+        {"row": 1, "col": 4, "hint": "Small rodent that rhymes with its more popular cousin", "num": 4, "dir": "down"},
+        {"row": 3, "col": 6, "hint": "Cheap wine", "num": 7, "dir": "down"},
+        {"row": 3, "col": 10, "hint": "Home for Peter and pirates", "num": 8, "dir": "down"},
+        {"row": 7, "col": 4, "hint": "Movie series featuring a Goldbergian psychopath", "num": 10, "dir": "down"},
+        {"row": 7, "col": 7, "hint": "Shoot the breeze", "num": 11, "dir": "down"},
+        {"row": 10, "col": 5, "hint": "Shrek and friends", "num": 15, "dir": "down"}
+    ]
+}
