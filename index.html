@@ -46,7 +46,7 @@
                 const mistakeCheckBox = document.getElementById('showmistakes');
                 mistakeCheckBox.onchange = (event) => {
                     showMistakes = mistakeCheckBox.checked;
-                    render();
+                    drawPuzzleGrid();
                 };
                 fetch('puzzle.json').then((response) => {
                     return response.json();
@@ -67,6 +67,8 @@
                     answerSquares += row;
                 }
 
+                // Clear out all of the answers, replacing with blanks.
+                // (keep underscores, which denote black squares)
                 currentSquares = answerSquares.replaceAll(/[^_]/gi, ' ');
 
                 startSquares = [];
@@ -83,12 +85,9 @@
 
                     const dirClues = puzzle.clues.filter((clue) => clue.dir == dir);
                     dirClues.sort((a, b) => a.num - b.num);
-                    console.log(dirClues);
                     for (const clue of dirClues) {
-                        console.log(clue);
                         startSquares[clue.row * numCols + clue.col] = clue.num;
                         clues.push(clue);
-                        console.log('>>>', clues);
 
                         const elem = document.createElement('div');
                         elem.innerText = clue.num + '. ' + clue.hint;
@@ -103,15 +102,13 @@
                         };
                     }
 
-                    console.log(clues);
-
                     // Spacer
                     const spacer = document.createElement('div');
                     spacer.innerHTML = '<br/>';
                     clueList.appendChild(spacer);
                 }
 
-                // Select firts clue
+                // Select first clue
                 focusRow = clues[0].row;
                 focusCol = clues[0].col;
                 currentWordDir = clues[0].dir;
@@ -132,7 +129,7 @@
                 return answerSquares[row * numCols + col];
             }
 
-            function render() {
+            function drawPuzzleGrid() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Highlight the word that the cursor is currently in.
@@ -147,7 +144,7 @@
                                     (currentWordEnd - currentWordStart + 1) * cellHeight);
                 }
 
-                // Draw grid
+                // Draw grid lines
                 context.beginPath();
                 context.strokeStyle = 'black';
                 context.lineWidth = 1;
@@ -164,7 +161,6 @@
                 }
 
                 context.stroke();
-
 
                 // Draw letters and blanks
                 for (let rowi = 0; rowi < numRows; rowi++) {
@@ -211,7 +207,7 @@
 
             function updateFocus() {
                 findHighlightWord();
-                render();
+                drawPuzzleGrid();
             }
 
             function navigateRight() {
@@ -282,7 +278,7 @@
                         currentWordDir = clues[currentClue].dir;
                         findHighlightWord();
                         findNextUnfilled();
-                        render();
+                        drawPuzzleGrid();
                         break;
                     case 'Backspace':
                         if (!solved) {
@@ -310,7 +306,7 @@
 
                 if (answerSquares == currentSquares) {
                     solved = true;
-                    render();
+                    drawPuzzleGrid();
                 }
             }
 
@@ -337,7 +333,7 @@
                     }
                 }
 
-                render();
+                drawPuzzleGrid();
             }
 
             function findNextUnfilled() {
@@ -373,10 +369,10 @@
             }
 
             function handleMouseDown(event) {
-                const clickCol = Math.floor(event.x / cellWidth);
-                const clickRow = Math.floor(event.y / cellHeight);
+                const clickCol = Math.floor(event.clientX / cellWidth);
+                const clickRow = Math.floor(event.clientY / cellHeight);
                 if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
-                    if (currentSquares[clickRow * numCols + clickCol] != '_') {
+                    if (getCellValue(clickRow, clickCol) != '_') {
                         focusRow = clickRow;
                         focusCol = clickCol;
                         updateFocus();
