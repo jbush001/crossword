@@ -369,8 +369,11 @@
             }
 
             function handleMouseDown(event) {
-                const clickCol = Math.floor(event.clientX / cellWidth);
-                const clickRow = Math.floor(event.clientY / cellHeight);
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                const clickCol = Math.floor(x / cellWidth);
+                const clickRow = Math.floor(y / cellHeight);
                 if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
                     if (getCellValue(clickRow, clickCol) != '_') {
                         focusRow = clickRow;
