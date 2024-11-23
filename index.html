@@ -109,7 +109,7 @@
             function render() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw focus highlight
+                // Highlight the word that is currently being solved.
                 if (!solved) {
                     context.fillStyle = '#b2bfdd';
                     if (currentWordDir == 'across') {
@@ -123,59 +123,9 @@
                     }
                 }
 
-                for (let rowi = 0; rowi < numRows; rowi++) {
-                    for (let coli = 0; coli < numCols; coli++) {
-                        const ch = getCellValue(rowi, coli).toUpperCase();
-                        if (ch == '_') {
-                            context.fillStyle = 'black';
-                            context.fillRect(coli * cellWidth, rowi * cellHeight,
-                                             cellWidth, cellHeight);
-                        } else {
-                            if (rowi == focusRow && coli == focusCol && !solved) {
-                                context.fillStyle = '#596fa1';
-                                context.fillRect(coli * cellWidth, rowi * cellHeight,
-                                                 cellWidth, cellHeight);
-                            }
-
-                            if (showMistakes && getExpectedValue(rowi, coli).toUpperCase() != ch) {
-                                context.fillStyle = 'red';
-                            } else {
-                                context.fillStyle = 'black';
-                            }
-
-                            context.font = '16pt monospace';
-                            context.fontWeight = 'bold';
-                            const metrics = context.measureText(ch);
-                            const x = coli * cellWidth + (cellWidth - metrics.width) / 2;
-                            const glyphHeight = metrics.fontBoundingBoxAscent +
-                                                metrics.fontBoundingBoxDescent;
-                            const y = rowi * cellHeight + (cellHeight - glyphHeight) / 2 +
-                                            metrics.fontBoundingBoxAscent;
-                            context.fillText(ch, x, y);
-
-                            const startNum = startSquares[rowi * numCols + coli];
-                            if (startNum != -1) {
-                                context.fillStyle = 'black';
-                                context.font = '8pt monospace';
-                                context.fontWeight = 'normal';
-                                context.fillText(startNum.toString(), coli * cellWidth + 2,
-                                                 rowi * cellHeight + 10);
-                            }
-                        }
-                    }
-                }
-
-                if (!solved) {
-                    context.fillStyle = 'black';
-                    context.font = '12pt monospace';
-                    context.fontWeight = 'bold';
-                    const clue = clues[currentClue];
-                    context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
-                }
-
                 // Draw grid
                 context.beginPath();
-                context.strokeStyle = 'gray';
+                context.strokeStyle = 'black';
                 context.lineWidth = 1;
                 for (let rowi = 0; rowi <= numRows; rowi++) {
                     const y = cellHeight * rowi;
@@ -190,6 +140,57 @@
                 }
 
                 context.stroke();
+
+
+                // Draw letters and blanks
+                for (let rowi = 0; rowi < numRows; rowi++) {
+                    for (let coli = 0; coli < numCols; coli++) {
+                        const ch = getCellValue(rowi, coli).toUpperCase();
+                        if (ch == '_') {
+                            context.fillStyle = 'black';
+                            context.fillRect(coli * cellWidth, rowi * cellHeight,
+                                             cellWidth, cellHeight);
+                        } else {
+                            if (rowi == focusRow && coli == focusCol && !solved) {
+                                    context.fillStyle = '#596fa1';
+                                context.fillRect(coli * cellWidth, rowi * cellHeight,
+                                                 cellWidth, cellHeight);
+                            }
+
+                            if (showMistakes && getExpectedValue(rowi, coli).toUpperCase() != ch) {
+                                context.fillStyle = 'red';
+                            } else {
+                                context.fillStyle = 'black';
+                            }
+
+                            context.font = '16pt monospace';
+                            const metrics = context.measureText(ch);
+                            const x = coli * cellWidth + (cellWidth - metrics.width) / 2;
+                            const glyphHeight = metrics.fontBoundingBoxAscent +
+                                                metrics.fontBoundingBoxDescent;
+                            const y = rowi * cellHeight + (cellHeight - glyphHeight) / 2 +
+                                            metrics.fontBoundingBoxAscent;
+                            context.fillText(ch, x, y);
+
+                            const startNum = startSquares[rowi * numCols + coli];
+                            if (startNum != -1) {
+                                context.fillStyle = 'black';
+                                context.font = '8pt sans serif';
+                                context.fontWeight = 'normal';
+                                context.fillText(startNum.toString(), coli * cellWidth + 2,
+                                                 rowi * cellHeight + 10);
+                            }
+                        }
+                    }
+                }
+
+                // Draw the clue
+                if (!solved) {
+                    context.fillStyle = 'black';
+                    context.font = '12pt monospace';
+                    const clue = clues[currentClue];
+                    context.fillText(clue.num + '. ' + clue.hint, 5, canvas.height - 6);
+                }
             }
 
             function updateFocus() {
