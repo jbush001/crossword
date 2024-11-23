@@ -62,17 +62,16 @@
                 numCols = puzzle.numCols;
                 cellWidth = Math.floor(canvas.width / numCols);
                 cellHeight = Math.floor(canvas.height / numRows);
-                answerSquares = puzzle.answers.replaceAll('\n', '');
+                answerSquares = '';
+                for (const row of puzzle.answers) {
+                    answerSquares += row;
+                }
+
                 currentSquares = answerSquares.replaceAll(/[^_]/gi, ' ');
 
                 startSquares = [];
                 for (let i = 0; i < numRows * numCols; i++) {
                     startSquares.push(-1);
-                }
-
-                clues = puzzle.clues;
-                for (const clue of puzzle.clues) {
-                    startSquares[clue.row * numCols + clue.col] = clue.num;
                 }
 
                 // Populate the clue list
@@ -82,21 +81,29 @@
                     header.innerHTML = '<b>' + dir.toUpperCase() + '<b>';
                     clueList.appendChild(header);
 
-                    for (const clue of clues) {
-                        if (clue.dir == dir) {
-                            const elem = document.createElement('div');
-                            elem.innerText = clue.num + '. ' + clue.hint;
-                            clueList.appendChild(elem);
-                            clue.element = elem;
-                            elem.onclick = (event) => {
-                                // Jump to this clue
-                                focusRow = clue.row;
-                                focusCol = clue.col;
-                                currentWordDir = clue.dir;
-                                updateFocus();
-                            };
-                        }
+                    const dirClues = puzzle.clues.filter((clue) => clue.dir == dir);
+                    dirClues.sort((a, b) => a.num - b.num);
+                    console.log(dirClues);
+                    for (const clue of dirClues) {
+                        console.log(clue);
+                        startSquares[clue.row * numCols + clue.col] = clue.num;
+                        clues.push(clue);
+                        console.log('>>>', clues);
+
+                        const elem = document.createElement('div');
+                        elem.innerText = clue.num + '. ' + clue.hint;
+                        clueList.appendChild(elem);
+                        clue.element = elem;
+                        elem.onclick = (event) => {
+                            // Jump to this clue
+                            focusRow = clue.row;
+                            focusCol = clue.col;
+                            currentWordDir = clue.dir;
+                            updateFocus();
+                        };
                     }
+
+                    console.log(clues);
 
                     // Spacer
                     const spacer = document.createElement('div');
