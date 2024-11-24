@@ -15,31 +15,17 @@
 #
 
 import json
+import sys
 
-WORD_LIST = [
-    'aardvark',
-    'vole',
-    'edgelord',
-    'deviate',
-    'drakes',
-    'norad',
-    'epee',
-    'puma',
-    'ogres',
-    'ligaments',
-    'vibranium',
-    'gallo',
-    'saw',
-    'abut',
-    'commit'
-]
+clues = []
+
 
 BLANK = '_'
 
 cross_lookup = {}
 
 def init_cross_lookup():
-    for word_index, word in enumerate(WORD_LIST):
+    for word_index, (word, _) in enumerate(clues):
         for offset, letter in enumerate(word):
             if letter in cross_lookup:
                 cross_lookup[letter].append((word_index, offset))
@@ -105,7 +91,7 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
             if used_word_map[word_index]:
                 continue
 
-            new_word = WORD_LIST[word_index]
+            new_word = clues[word_index][0]
 
             if new_dir == 'across':
                 new_row = row + letter_offset
@@ -140,11 +126,11 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
 def create_puzzle(size):
     # Place initial word near the middle of the puzzle
     empty_grid = [BLANK for _ in range(size * size)]
-    used_word_map = [False for _ in range(len(WORD_LIST))]
+    used_word_map = [False for _ in range(len(clues))]
 
     initial_word_index = 0  # XXX Should pick longest
     used_word_map[initial_word_index] = True
-    initial_word = WORD_LIST[initial_word_index]
+    initial_word = clues[initial_word_index][0]
     initial_word_row = size // 2
     initial_word_col = (size - len(initial_word)) // 2
     new_grid = try_to_add_word(empty_grid, size, initial_word_row,
@@ -155,7 +141,7 @@ def create_puzzle(size):
         print('Internal error: cannot place initial word')
         return None
 
-    clue_locs = [None for _ in range(len(WORD_LIST))]
+    clue_locs = [None for _ in range(len(clues))]
     clue_locs[0] = (initial_word_row, initial_word_col, 'across')
     return try_to_expand_word((new_grid, clue_locs), size, used_word_map, initial_word_row,
                        initial_word_col, 'across', initial_word)
@@ -173,20 +159,22 @@ def write_puzzle_json(size, grid, clue_locs):
     number_map = {}
     next_index = 1
     for row, col in locs:
-        number_map[(row, col)] = next_index
-        next_index += 1
+        if (row, col) not in number_map:
+            number_map[(row, col)] = next_index
+            next_index += 1
 
-    clues = []
-    for i in range(len(WORD_LIST)):
+    out_clues = []
+    for i in range(len(clues)):
         row, col, dir = clue_locs[i]
-        clues.append({'row': row, 'col': col, 'hint': WORD_LIST[i], 'num': number_map[(row, col)], 'dir': dir})
+        _, hint = clues[i]
+        out_clues.append({'row': row, 'col': col, 'hint': hint, 'num': number_map[(row, col)], 'dir': dir})
 
     result = {
         'title': 'insert title',
         'numRows': size,
         'numCols': size,
         'answers': answers,
-        'clues': clues,
+        'clues': out_clues,
     }
 
     print(json.dumps(result, indent=4))
@@ -198,14 +186,23 @@ def pretty_print_puzzle(puzzle, size):
         if i % size == size - 1:
             print()
 
-def main():
-    SIZE = 15
-    init_cross_lookup()
-    result = create_puzzle(SIZE)
-    if result == None:
-        print('cannot find a solution')
-    else:
-        print('success')
-        write_puzzle_json(SIZE, *result)
+def load_clues(filename):
+    global clues
+    clues = []
+    with open(filename, 'r') as cluefile:
+        for line in cluefile:
+            word, hint = line.split(' ', 1)
+            clues.append((word, hint.strip()))
 
-main()
+def main():
+    load_clues(sys.argv[1])
+    size = int(sys.argv[2])
+    init_cross_lookup()
+    result = create_puzzle(size)
+    if result == None:
+        print('cannot find a solution', file=sys.stderr)
+    else:
+        write_puzzle_json(size, *result)
+
+if __name__ == '__main__':
+    main()

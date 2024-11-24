@@ -1,129 +1,136 @@
 {
-    "title": "My Puzzle",
+    "title": "insert title",
     "numRows": 15,
     "numCols": 15,
     "answers": [
-        "_______________",
-        "_____v_________",
-        "____commit_____",
-        "_v___l_________",
-        "ligaments_d____",
-        "_b________r____",
-        "_r____e___a____",
-        "_a_aardvark__d_",
-        "_n____g___epee_",
-        "_i_g__e___s__v_",
-        "puma__l______i_",
-        "_m_l__ogres__a_",
-        "___l__r___abut_",
-        "__norad___w__e_",
+        "________c_d____",
+        "____s___ogres__",
+        "vibranium_a____",
+        "____w___m_k__d_",
+        "___p____i_epee_",
+        "___o____t_s__v_",
+        "___t_________i_",
+        "___aardvark__a_",
+        "___b_________t_",
+        "_n_l_g_riptide_",
+        "vole_a___u_____",
+        "_r___ligaments_",
+        "_a___l___a_____",
+        "edgelord_______",
         "_______________"
     ],
     "clues": [
         {
             "row": 7,
             "col": 3,
-            "hint": "The first entry in any encyclopedia",
-            "num": 7,
-            "dir": "across"
-        },
-        {
-            "row": 1,
-            "col": 5,
-            "hint": "Small rodent that rhymes with its more popular cousin",
-            "num": 1,
-            "dir": "down"
-        },
-        {
-            "row": 6,
-            "col": 6,
-            "hint": "Internet provocateur",
-            "num": 6,
-            "dir": "down"
-        },
-        {
-            "row": 7,
-            "col": 13,
-            "hint": "depart",
-            "num": 8,
-            "dir": "down"
-        },
-        {
-            "row": 4,
-            "col": 10,
-            "hint": "Huey, Duey, Louie, but not Daisy",
-            "num": 5,
-            "dir": "down"
-        },
-        {
-            "row": 13,
-            "col": 2,
-            "hint": "Agency responsible for tracking St. Nick",
-            "num": 15,
-            "dir": "across"
-        },
-        {
-            "row": 8,
-            "col": 10,
-            "hint": "Necessary implement for implementing a riposte",
+            "hint": "First entry in any encyclopedia",
             "num": 9,
             "dir": "across"
         },
         {
             "row": 10,
             "col": 0,
+            "hint": "Small rodent that rhymes with its more popular cousin",
+            "num": 14,
+            "dir": "across"
+        },
+        {
+            "row": 13,
+            "col": 0,
+            "hint": "Internet provocateur",
+            "num": 16,
+            "dir": "across"
+        },
+        {
+            "row": 0,
+            "col": 10,
+            "hint": "Huey, Dewey, Louie, but not Daisy",
+            "num": 2,
+            "dir": "down"
+        },
+        {
+            "row": 9,
+            "col": 1,
+            "hint": "Federal agency responsible for tracking St. Nick",
+            "num": 10,
+            "dir": "down"
+        },
+        {
+            "row": 4,
+            "col": 10,
+            "hint": "Necessary implement for implementing a riposte",
+            "num": 8,
+            "dir": "across"
+        },
+        {
+            "row": 9,
+            "col": 9,
             "hint": "Cat that goes by many names",
-            "num": 11,
+            "num": 13,
+            "dir": "down"
+        },
+        {
+            "row": 1,
+            "col": 8,
+            "hint": "Shrek and fam",
+            "num": 4,
             "dir": "across"
         },
         {
             "row": 11,
-            "col": 6,
-            "hint": "Shrek and fam",
+            "col": 5,
+            "hint": "What actually connects dem bones",
+            "num": 15,
+            "dir": "across"
+        },
+        {
+            "row": 2,
+            "col": 0,
+            "hint": "Fictional durable comic book metal",
+            "num": 5,
+            "dir": "across"
+        },
+        {
+            "row": 9,
+            "col": 5,
+            "hint": "Cheap wine",
+            "num": 11,
+            "dir": "down"
+        },
+        {
+            "row": 0,
+            "col": 8,
+            "hint": "Make a plan, stick to it...",
+            "num": 1,
+            "dir": "down"
+        },
+        {
+            "row": 1,
+            "col": 4,
+            "hint": "Movie about a goldbergian psychopath",
+            "num": 3,
+            "dir": "down"
+        },
+        {
+            "row": 3,
+            "col": 13,
+            "hint": "Alter the path",
+            "num": 6,
+            "dir": "down"
+        },
+        {
+            "row": 9,
+            "col": 7,
+            "hint": "Hazard to swimmers and boaters",
             "num": 12,
             "dir": "across"
         },
         {
             "row": 4,
-            "col": 0,
-            "hint": "What actually connects dem bones",
-            "num": 4,
-            "dir": "across"
-        },
-        {
-            "row": 3,
-            "col": 1,
-            "hint": "Fictional durable comic book metal",
-            "num": 3,
-            "dir": "down"
-        },
-        {
-            "row": 9,
             "col": 3,
-            "hint": "Cheap wine",
-            "num": 10,
+            "hint": "Drinkable",
+            "num": 7,
             "dir": "down"
-        },
-        {
-            "row": 11,
-            "col": 10,
-            "hint": "Movie about a goldbergian psychopath",
-            "num": 13,
-            "dir": "down"
-        },
-        {
-            "row": 12,
-            "col": 10,
-            "hint": "What some of these clues do",
-            "num": 14,
-            "dir": "across"
-        },
-        {
-            "row": 2,
-            "col": 4,
-            "hint": "Make a plan, stick to it...",
-            "num": 2,
-            "dir": "across"
         }
     ]
 }
