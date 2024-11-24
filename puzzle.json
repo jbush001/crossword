@@ -3,39 +3,127 @@
     "numRows": 15,
     "numCols": 15,
     "answers": [
-        "v______________",
-        "aardvark_______",
-        "n_e_o__________",
-        "a_b_ligaments__",
-        "drake_a___e____",
-        "i_r___l__ever__",
-        "u_____l___e____",
-        "m___score_r____",
-        "____a__a__l____",
-        "____w__puma____",
-        "_____o____norad",
-        "___edgelord____",
-        "_____r_________",
-        "___epee________",
-        "_____s_________"
+        "_______________",
+        "_____v_________",
+        "____commit_____",
+        "_v___l_________",
+        "ligaments_d____",
+        "_b________r____",
+        "_r____e___a____",
+        "_a_aardvark__d_",
+        "_n____g___epee_",
+        "_i_g__e___s__v_",
+        "puma__l______i_",
+        "_m_l__ogres__a_",
+        "___l__r___abut_",
+        "__norad___w__e_",
+        "_______________"
     ],
     "clues": [
-        {"row": 1, "col": 0, "hint": "First entry in any encyclopedia", "num": 2, "dir": "across"},
-        {"row": 10, "col": 5, "hint": "Shrek and fam", "num": 15, "dir": "down"},
-        {"row": 9, "col": 7, "hint": "Cougar, panther, mountain lion, catamont, ...", "num": 12, "dir": "across"},
-        {"row": 11, "col": 3, "hint": "Internet provocateur", "num": 14, "dir": "across"},
-        {"row": 10, "col": 10, "hint": "Agency responsible for tracking St. Nick", "num": 13, "dir": "across"},
-        {"row": 13, "col": 3, "hint": "Necessary implement for a riposte", "num": 16, "dir": "across"},
-        {"row": 1, "col": 2, "hint": "Foundation bones", "num": 3, "dir": "down"},
-        {"row": 3, "col": 4, "hint": "What actually connects dem bones", "num": 5, "dir": "across"},
-        {"row": 4, "col": 0, "hint": "Huey, Dewey, Louie, but not Daisy", "num": 6, "dir": "across"},
-        {"row": 5, "col": 9, "hint": "Unending", "num": 9, "dir": "across"},
-        {"row": 7, "col": 4, "hint": "Something to be settled", "num": 10, "dir": "across"},
-        {"row": 0, "col": 0, "hint": "Rare metal", "num": 1, "dir": "down"},
-        {"row": 1, "col": 4, "hint": "Small rodent that rhymes with its more popular cousin", "num": 4, "dir": "down"},
-        {"row": 3, "col": 6, "hint": "Cheap wine", "num": 7, "dir": "down"},
-        {"row": 3, "col": 10, "hint": "Home for Peter and pirates", "num": 8, "dir": "down"},
-        {"row": 7, "col": 4, "hint": "Movie series featuring a Goldbergian psychopath", "num": 10, "dir": "down"},
-        {"row": 7, "col": 7, "hint": "Shoot the breeze", "num": 11, "dir": "down"}
+        {
+            "row": 7,
+            "col": 3,
+            "hint": "The first entry in any encyclopedia",
+            "num": 7,
+            "dir": "across"
+        },
+        {
+            "row": 1,
+            "col": 5,
+            "hint": "Small rodent that rhymes with its more popular cousin",
+            "num": 1,
+            "dir": "down"
+        },
+        {
+            "row": 6,
+            "col": 6,
+            "hint": "Internet provocateur",
+            "num": 6,
+            "dir": "down"
+        },
+        {
+            "row": 7,
+            "col": 13,
+            "hint": "depart",
+            "num": 8,
+            "dir": "down"
+        },
+        {
+            "row": 4,
+            "col": 10,
+            "hint": "Huey, Duey, Louie, but not Daisy",
+            "num": 5,
+            "dir": "down"
+        },
+        {
+            "row": 13,
+            "col": 2,
+            "hint": "Agency responsible for tracking St. Nick",
+            "num": 15,
+            "dir": "across"
+        },
+        {
+            "row": 8,
+            "col": 10,
+            "hint": "Necessary implement for implementing a riposte",
+            "num": 9,
+            "dir": "across"
+        },
+        {
+            "row": 10,
+            "col": 0,
+            "hint": "Cat that goes by many names",
+            "num": 11,
+            "dir": "across"
+        },
+        {
+            "row": 11,
+            "col": 6,
+            "hint": "Shrek and fam",
+            "num": 12,
+            "dir": "across"
+        },
+        {
+            "row": 4,
+            "col": 0,
+            "hint": "What actually connects dem bones",
+            "num": 4,
+            "dir": "across"
+        },
+        {
+            "row": 3,
+            "col": 1,
+            "hint": "Fictional durable comic book metal",
+            "num": 3,
+            "dir": "down"
+        },
+        {
+            "row": 9,
+            "col": 3,
+            "hint": "Cheap wine",
+            "num": 10,
+            "dir": "down"
+        },
+        {
+            "row": 11,
+            "col": 10,
+            "hint": "Movie about a goldbergian psychopath",
+            "num": 13,
+            "dir": "down"
+        },
+        {
+            "row": 12,
+            "col": 10,
+            "hint": "What some of these clues do",
+            "num": 14,
+            "dir": "across"
+        },
+        {
+            "row": 2,
+            "col": 4,
+            "hint": "Make a plan, stick to it...",
+            "num": 2,
+            "dir": "across"
+        }
     ]
 }
