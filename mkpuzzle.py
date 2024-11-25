@@ -22,6 +22,7 @@ BLANK = '_'
 clues = []
 cross_lookup = {}
 
+
 def init_cross_lookup():
     """Create a lookup table to find all words that have a specific letter in
     them.
@@ -174,12 +175,13 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
 
     return None
 
+
 def create_puzzle(size):
     # Place initial word near the middle of the puzzle
     empty_grid = [BLANK for _ in range(size * size)]
     used_word_map = [False for _ in range(len(clues))]
 
-    initial_word_index = 0  # XXX Should pick longest
+    initial_word_index = 0  # This will be longest
     used_word_map[initial_word_index] = True
     initial_word = clues[initial_word_index][0]
     initial_word_row = size // 2
@@ -195,6 +197,7 @@ def create_puzzle(size):
     clue_locs[0] = (initial_word_row, initial_word_col, 'across')
     return try_to_expand_word((new_grid, clue_locs), size, used_word_map, initial_word_row,
                        initial_word_col, 'across', initial_word)
+
 
 def write_puzzle_json(filename, size, grid, clue_locs):
     answers = []
@@ -236,11 +239,13 @@ def write_puzzle_json(filename, size, grid, clue_locs):
     with open(filename, 'w') as f:
         json.dump(result, f, indent=4)
 
+
 def pretty_print_puzzle(puzzle, size):
     for i, letter in enumerate(puzzle):
         print(letter, sep='', end='')
         if i % size == size - 1:
             print()
+
 
 def load_clues(filename):
     """Read clues file, populate global clues array
@@ -257,7 +262,11 @@ def load_clues(filename):
     with open(filename, 'r') as cluefile:
         for line in cluefile:
             word, hint = line.split(' ', 1)
-            clues.append((word, hint.strip()))
+            clues.append((word.strip(), hint.strip()))
+
+    # Sort longest to shortest.
+    clues.sort(key=lambda x: len(x[0]), reverse=True)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a crossword puzzle')

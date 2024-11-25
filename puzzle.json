@@ -3,133 +3,133 @@
     "numRows": 15,
     "numCols": 15,
     "answers": [
-        "________c_d____",
-        "____s___ogres__",
-        "vibranium_a____",
-        "____w___m_k__d_",
-        "___p____i_epee_",
-        "___o____t_s__v_",
-        "___t_________i_",
-        "___aardvark__a_",
-        "___b_________t_",
-        "_n_l_g_riptide_",
-        "vole_a___u_____",
-        "_r___ligaments_",
-        "_a___l___a_____",
-        "edgelord_______",
+        "s_____d________",
+        "aardvark_______",
+        "w_____a___c____",
+        "_v____k__norad_",
+        "riptide___m__e_",
+        "_b____s___m__v_",
+        "_r________i__i_",
+        "_a_ligaments_a_",
+        "_n___________t_",
+        "_i_g___potable_",
+        "puma_e__g______",
+        "_m_l_p__r______",
+        "___l_edgelord__",
+        "__vole__s______",
         "_______________"
     ],
     "clues": [
         {
             "row": 7,
             "col": 3,
-            "hint": "First entry in any encyclopedia",
+            "hint": "What actually connects dem bones",
             "num": 9,
             "dir": "across"
         },
         {
-            "row": 10,
-            "col": 0,
-            "hint": "Small rodent that rhymes with its more popular cousin",
-            "num": 14,
-            "dir": "across"
-        },
-        {
-            "row": 13,
-            "col": 0,
-            "hint": "Internet provocateur",
-            "num": 16,
-            "dir": "across"
-        },
-        {
-            "row": 0,
-            "col": 10,
-            "hint": "Huey, Dewey, Louie, but not Daisy",
-            "num": 2,
-            "dir": "down"
-        },
-        {
-            "row": 9,
+            "row": 3,
             "col": 1,
-            "hint": "Federal agency responsible for tracking St. Nick",
-            "num": 10,
-            "dir": "down"
-        },
-        {
-            "row": 4,
-            "col": 10,
-            "hint": "Necessary implement for implementing a riposte",
-            "num": 8,
-            "dir": "across"
-        },
-        {
-            "row": 9,
-            "col": 9,
-            "hint": "Cat that goes by many names",
-            "num": 13,
-            "dir": "down"
-        },
-        {
-            "row": 1,
-            "col": 8,
-            "hint": "Shrek and fam",
-            "num": 4,
-            "dir": "across"
-        },
-        {
-            "row": 11,
-            "col": 5,
-            "hint": "What actually connects dem bones",
-            "num": 15,
-            "dir": "across"
-        },
-        {
-            "row": 2,
-            "col": 0,
             "hint": "Fictional durable comic book metal",
             "num": 5,
-            "dir": "across"
-        },
-        {
-            "row": 9,
-            "col": 5,
-            "hint": "Cheap wine",
-            "num": 11,
-            "dir": "down"
-        },
-        {
-            "row": 0,
-            "col": 8,
-            "hint": "Make a plan, stick to it...",
-            "num": 1,
             "dir": "down"
         },
         {
             "row": 1,
-            "col": 4,
-            "hint": "Movie about a goldbergian psychopath",
+            "col": 0,
+            "hint": "First entry in any encyclopedia",
             "num": 3,
-            "dir": "down"
+            "dir": "across"
+        },
+        {
+            "row": 12,
+            "col": 5,
+            "hint": "Internet provocateur",
+            "num": 15,
+            "dir": "across"
         },
         {
             "row": 3,
             "col": 13,
             "hint": "Alter the path",
-            "num": 6,
+            "num": 7,
             "dir": "down"
+        },
+        {
+            "row": 4,
+            "col": 0,
+            "hint": "Hazard to swimmers and boaters",
+            "num": 8,
+            "dir": "across"
         },
         {
             "row": 9,
             "col": 7,
-            "hint": "Hazard to swimmers and boaters",
-            "num": 12,
+            "hint": "Not brackish, stagnant, contaminated...",
+            "num": 11,
             "dir": "across"
         },
         {
-            "row": 4,
+            "row": 0,
+            "col": 6,
+            "hint": "Huey, Dewey, Louie, but not Daisy",
+            "num": 2,
+            "dir": "down"
+        },
+        {
+            "row": 2,
+            "col": 10,
+            "hint": "Make a plan, stick to it...",
+            "num": 4,
+            "dir": "down"
+        },
+        {
+            "row": 3,
+            "col": 9,
+            "hint": "Federal agency responsible for tracking St. Nick",
+            "num": 6,
+            "dir": "across"
+        },
+        {
+            "row": 9,
+            "col": 8,
+            "hint": "Shrek and fam",
+            "num": 12,
+            "dir": "down"
+        },
+        {
+            "row": 9,
             "col": 3,
-            "hint": "Drinkable",
-            "num": 7,
+            "hint": "Cheap wine",
+            "num": 10,
+            "dir": "down"
+        },
+        {
+            "row": 13,
+            "col": 2,
+            "hint": "Small rodent that rhymes with its more popular cousin",
+            "num": 16,
+            "dir": "across"
+        },
+        {
+            "row": 10,
+            "col": 5,
+            "hint": "Necessary implement for implementing a riposte",
+            "num": 14,
+            "dir": "down"
+        },
+        {
+            "row": 10,
+            "col": 0,
+            "hint": "Cat that goes by many names",
+            "num": 13,
+            "dir": "across"
+        },
+        {
+            "row": 0,
+            "col": 0,
+            "hint": "Movie about a goldbergian psychopath",
+            "num": 1,
             "dir": "down"
         }
     ]
