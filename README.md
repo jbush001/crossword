@@ -1,6 +1,6 @@
 To generate a puzzle, edit clues.txt, then:
 
-    python3 mkpuzzle.py clues.txt 15 > puzzle.json
+    python3 mkpuzzle.py clues.txt 15
 
 *In this case, 15 is the number of rows and columns.*
 

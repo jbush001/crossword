@@ -23,6 +23,9 @@ clues = []
 cross_lookup = {}
 
 def init_cross_lookup():
+    """Create a lookup table to find all words that have a specific letter in
+    them.
+    """
     for word_index, (word, _) in enumerate(clues):
         for offset, letter in enumerate(word):
             if letter in cross_lookup:
@@ -32,6 +35,28 @@ def init_cross_lookup():
 
 
 def try_to_add_word(puzzle_data, size, row, col, dir, word):
+    """Insert a new word into the current working puzzle and return a
+    new instance.
+
+    Args:
+        puzzle_data: array.
+          Each entry in the array represents one cell in the puzzle.
+        size: int
+          Number of cells vertically and horizontally.
+        row: int
+          0 based index starting from top of the start of this word
+        col: int
+          0 based index starting from left of the start of this word
+        dir: string
+          Can be 'across' or 'down' describing the direction of the clue.
+        word: string
+          Contents of the word
+
+    Returns:
+        A newly allocated array, based on puzzle_data, with the new
+        word inserted if it fits.
+        None if the word will not fit for some reason
+    """
     result = puzzle_data[:]
 
     # Ensure the first and last letters do not abut another
@@ -77,6 +102,34 @@ def try_to_add_word(puzzle_data, size, row, col, dir, word):
 
 
 def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
+    """Attempts to find another word that will orthoganlly fit with this word.
+
+    This uses a simplistic algorithm that doesn't do a great job fitting.
+    It will sort of make a spiral of clues, as it only crosses each clue
+    deliberately once.
+
+    Args:
+        puzzle_data: tuple (grid, clues)
+            Initial puzzle state
+        size: int
+            Number of cells vertically and horizontally
+        used_word_map: array bool
+            One entry for each clue. True if it has already been placed,
+            False if not. This is updated in-place.
+        row: int
+            Vertical index of the start of the word to try to cross
+        col: int
+            Same as above, except horizontal
+        dir: string: 'across' | 'down'
+            Which direction the word to cross is oriented
+        word: string
+            The word we are trying to cross.
+
+    Returns:
+        A tuple of the puzzle grid and a clue array that contains start
+        positions for each placed clue on success.
+        None if it was unable to fit any words.
+    """
     if (all(used_word_map)):
         return puzzle_data
 
@@ -190,6 +243,15 @@ def pretty_print_puzzle(puzzle, size):
             print()
 
 def load_clues(filename):
+    """Read clues file, populate global clues array
+
+    Args:
+        filename: string
+            Path to file
+
+    Returns:
+        Nothing
+    """
     global clues
     clues = []
     with open(filename, 'r') as cluefile:
