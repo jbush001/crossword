@@ -16,6 +16,7 @@
 
 import json
 import sys
+import argparse
 
 BLANK = '_'
 clues = []
@@ -142,7 +143,7 @@ def create_puzzle(size):
     return try_to_expand_word((new_grid, clue_locs), size, used_word_map, initial_word_row,
                        initial_word_col, 'across', initial_word)
 
-def write_puzzle_json(size, grid, clue_locs):
+def write_puzzle_json(filename, size, grid, clue_locs):
     answers = []
     for row in range(size):
         answers.append(''.join(grid[row * size:(row + 1) * size]))
@@ -179,7 +180,8 @@ def write_puzzle_json(size, grid, clue_locs):
         'clues': out_clues,
     }
 
-    print(json.dumps(result, indent=4))
+    with open(filename, 'w') as f:
+        json.dump(result, f, indent=4)
 
 def pretty_print_puzzle(puzzle, size):
     for i, letter in enumerate(puzzle):
@@ -196,14 +198,22 @@ def load_clues(filename):
             clues.append((word, hint.strip()))
 
 def main():
-    load_clues(sys.argv[1])
-    size = int(sys.argv[2])
+    parser = argparse.ArgumentParser(description='Generate a crossword puzzle')
+    parser.add_argument('-o', '--output',
+                        help='Output file to write (JSON format)',
+                        default='puzzle.json')
+    parser.add_argument('clue_file', help='list of clues to read')
+    parser.add_argument('size', type=int, help='number of rows/columns')
+    args = parser.parse_args()
+
+    load_clues(args.clue_file)
+    size = args.size
     init_cross_lookup()
     result = create_puzzle(size)
     if result == None:
         print('cannot find a solution', file=sys.stderr)
     else:
-        write_puzzle_json(size, *result)
+        write_puzzle_json(args.output, size, *result)
 
 if __name__ == '__main__':
     main()
