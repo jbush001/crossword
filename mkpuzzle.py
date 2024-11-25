@@ -17,11 +17,8 @@
 import json
 import sys
 
-clues = []
-
-
 BLANK = '_'
-
+clues = []
 cross_lookup = {}
 
 def init_cross_lookup():
@@ -136,7 +133,6 @@ def create_puzzle(size):
     new_grid = try_to_add_word(empty_grid, size, initial_word_row,
                                initial_word_col, 'across',
                                initial_word)
-
     if new_grid == None:
         print('Internal error: cannot place initial word')
         return None
@@ -167,7 +163,13 @@ def write_puzzle_json(size, grid, clue_locs):
     for i in range(len(clues)):
         row, col, dir = clue_locs[i]
         _, hint = clues[i]
-        out_clues.append({'row': row, 'col': col, 'hint': hint, 'num': number_map[(row, col)], 'dir': dir})
+        out_clues.append({
+            'row': row,
+            'col': col,
+            'hint': hint,
+            'num': number_map[(row, col)],
+            'dir': dir
+        })
 
     result = {
         'title': 'insert title',
@@ -180,7 +182,6 @@ def write_puzzle_json(size, grid, clue_locs):
     print(json.dumps(result, indent=4))
 
 def pretty_print_puzzle(puzzle, size):
-    print('----------------------------------------')
     for i, letter in enumerate(puzzle):
         print(letter, sep='', end='')
         if i % size == size - 1:

@@ -66,6 +66,8 @@ limitations under the License.
         <script>
             'use strict';
 
+            const BLANK = '_';
+
             let numRows = 0;
             let numCols = 0;
             let cellWidth = 0;
@@ -219,7 +221,7 @@ limitations under the License.
                 for (let rowi = 0; rowi < numRows; rowi++) {
                     for (let coli = 0; coli < numCols; coli++) {
                         const ch = getCellValue(rowi, coli).toUpperCase();
-                        if (ch == '_') {
+                        if (ch == BLANK) {
                             context.fillStyle = 'black';
                             context.fillRect(coli * cellWidth, rowi * cellHeight,
                                              cellWidth, cellHeight);
@@ -265,7 +267,7 @@ limitations under the License.
 
             function navigateRight() {
                 for (let i = focusCol + 1; i < numCols; i++) {
-                    if (getCellValue(focusRow, i) != '_') {
+                    if (getCellValue(focusRow, i) != BLANK) {
                         focusCol = i;
                         updateFocus();
                         break;
@@ -275,7 +277,7 @@ limitations under the License.
 
             function navigateLeft() {
                 for (let i = focusCol - 1; i >= 0; i--) {
-                    if (getCellValue(focusRow, i) != '_') {
+                    if (getCellValue(focusRow, i) != BLANK) {
                         focusCol = i;
                         updateFocus();
                         break;
@@ -285,7 +287,7 @@ limitations under the License.
 
             function navigateUp() {
                 for (let i = focusRow - 1; i >= 0; i--) {
-                    if (getCellValue(i, focusCol) != '_') {
+                    if (getCellValue(i, focusCol) != BLANK) {
                         focusRow = i;
                         updateFocus();
                         break;
@@ -295,7 +297,7 @@ limitations under the License.
 
             function navigateDown() {
                 for (let i = focusRow + 1; i < numRows; i++) {
-                    if (getCellValue(i, focusCol) != '_') {
+                    if (getCellValue(i, focusCol) != BLANK) {
                         focusRow = i;
                         updateFocus();
                         break;
@@ -381,12 +383,12 @@ limitations under the License.
                 setCellValue(focusRow, focusCol, ' ');
                 if (currentWordDir == 'across') {
                     if (focusCol > 0 &&
-                        getCellValue(focusRow, focusCol - 1) != '_') {
+                        getCellValue(focusRow, focusCol - 1) != BLANK) {
                         focusCol--;
                     }
                 } else {
                     if (focusRow > 0 &&
-                        getCellValue(focusRow - 1, focusCol) != '_') {
+                        getCellValue(focusRow - 1, focusCol) != BLANK) {
                         focusRow--;
                     }
                 }
@@ -399,7 +401,7 @@ limitations under the License.
                     let newCol = focusCol;
                     while (newCol < numCols) {
                         const val = getCellValue(focusRow, newCol);
-                        if (val == '_') {
+                        if (val == BLANK) {
                             // No more blanks remaining
                             break;
                         } else  if (val == ' ') {
@@ -413,7 +415,7 @@ limitations under the License.
                     let newRow = focusRow;
                     while (newRow < numRows) {
                         const val = getCellValue(newRow, focusCol);
-                        if (val == '_') {
+                        if (val == BLANK) {
                             // No more blanks remaining
                             break;
                         } else  if (val == ' ') {
@@ -433,7 +435,7 @@ limitations under the License.
                 const clickCol = Math.floor(x / cellWidth);
                 const clickRow = Math.floor(y / cellHeight);
                 if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
-                    if (getCellValue(clickRow, clickCol) != '_') {
+                    if (getCellValue(clickRow, clickCol) != BLANK) {
                         focusRow = clickRow;
                         focusCol = clickCol;
                         updateFocus();
@@ -443,22 +445,22 @@ limitations under the License.
 
             function findWordBoundaries() {
                 let left = focusCol;
-                while (left > 0 && getCellValue(focusRow, left - 1) != '_') {
+                while (left > 0 && getCellValue(focusRow, left - 1) != BLANK) {
                     left--;
                 }
 
                 let right = focusCol;
-                while (right < numCols - 1 && getCellValue(focusRow, right + 1) != '_') {
+                while (right < numCols - 1 && getCellValue(focusRow, right + 1) != BLANK) {
                     right++;
                 }
 
                 let top = focusRow;
-                while (top > 0 && getCellValue(top - 1, focusCol) != '_') {
+                while (top > 0 && getCellValue(top - 1, focusCol) != BLANK) {
                     top--;
                 }
 
                 let bottom = focusRow;
-                while (bottom < numRows - 1 && getCellValue(bottom + 1, focusCol) != '_') {
+                while (bottom < numRows - 1 && getCellValue(bottom + 1, focusCol) != BLANK) {
                     bottom++;
                 }
 
