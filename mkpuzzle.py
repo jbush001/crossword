@@ -61,7 +61,6 @@ def try_to_add_word(puzzle_data, size, row, col, dir, word):
     result = puzzle_data[:]
 
     # Ensure the first and last letters do not abut another
-    word_len = len(word)
     if dir == 'across':
         if ((col > 0 and result[row * size + col - 1] != BLANK) or
             (col < size - 1 and result[row * size + col + len(word)] != BLANK)):
@@ -131,7 +130,7 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
         positions for each placed clue on success.
         None if it was unable to fit any words.
     """
-    if (all(used_word_map)):
+    if all(used_word_map):
         return puzzle_data
 
     grid, cluelocs = puzzle_data
@@ -189,7 +188,7 @@ def create_puzzle(size):
     new_grid = try_to_add_word(empty_grid, size, initial_word_row,
                                initial_word_col, 'across',
                                initial_word)
-    if new_grid == None:
+    if new_grid is None:
         print('Internal error: cannot place initial word')
         return None
 
@@ -217,15 +216,14 @@ def write_puzzle_json(filename, size, grid, clue_locs):
             next_index += 1
 
     out_clues = []
-    for i in range(len(clues)):
-        row, col, dir = clue_locs[i]
-        _, hint = clues[i]
+    for i, (_, hint) in enumerate(clues):
+        row, col, direction = clue_locs[i]
         out_clues.append({
             'row': row,
             'col': col,
             'hint': hint,
             'num': number_map[(row, col)],
-            'dir': dir
+            'dir': direction
         })
 
     result = {
@@ -236,7 +234,7 @@ def write_puzzle_json(filename, size, grid, clue_locs):
         'clues': out_clues,
     }
 
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=4)
 
 
@@ -259,7 +257,7 @@ def load_clues(filename):
     """
     global clues
     clues = []
-    with open(filename, 'r') as cluefile:
+    with open(filename, 'r', encoding='utf8') as cluefile:
         for line in cluefile:
             word, hint = line.split(' ', 1)
             clues.append((word.strip(), hint.strip()))
@@ -281,7 +279,7 @@ def main():
     size = args.size
     init_cross_lookup()
     result = create_puzzle(size)
-    if result == None:
+    if result is None:
         print('cannot find a solution', file=sys.stderr)
     else:
         write_puzzle_json(args.output, size, *result)
