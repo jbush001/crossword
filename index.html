@@ -66,7 +66,7 @@ limitations under the License.
         <script>
             'use strict';
 
-            const BLANK = '_';
+            const BLACK_SQUARE = '_';
 
             let numRows = 0;
             let numCols = 0;
@@ -221,7 +221,7 @@ limitations under the License.
                 for (let rowi = 0; rowi < numRows; rowi++) {
                     for (let coli = 0; coli < numCols; coli++) {
                         const ch = getCellValue(rowi, coli).toUpperCase();
-                        if (ch == BLANK) {
+                        if (ch == BLACK_SQUARE) {
                             context.fillStyle = 'black';
                             context.fillRect(coli * cellWidth, rowi * cellHeight,
                                              cellWidth, cellHeight);
@@ -267,7 +267,7 @@ limitations under the License.
 
             function navigateRight() {
                 for (let i = focusCol + 1; i < numCols; i++) {
-                    if (getCellValue(focusRow, i) != BLANK) {
+                    if (getCellValue(focusRow, i) != BLACK_SQUARE) {
                         focusCol = i;
                         updateFocus();
                         break;
@@ -277,7 +277,7 @@ limitations under the License.
 
             function navigateLeft() {
                 for (let i = focusCol - 1; i >= 0; i--) {
-                    if (getCellValue(focusRow, i) != BLANK) {
+                    if (getCellValue(focusRow, i) != BLACK_SQUARE) {
                         focusCol = i;
                         updateFocus();
                         break;
@@ -287,7 +287,7 @@ limitations under the License.
 
             function navigateUp() {
                 for (let i = focusRow - 1; i >= 0; i--) {
-                    if (getCellValue(i, focusCol) != BLANK) {
+                    if (getCellValue(i, focusCol) != BLACK_SQUARE) {
                         focusRow = i;
                         updateFocus();
                         break;
@@ -297,12 +297,31 @@ limitations under the License.
 
             function navigateDown() {
                 for (let i = focusRow + 1; i < numRows; i++) {
-                    if (getCellValue(i, focusCol) != BLANK) {
+                    if (getCellValue(i, focusCol) != BLACK_SQUARE) {
                         focusRow = i;
                         updateFocus();
                         break;
                     }
                 }
+            }
+
+            function goToNextClue(reverse) {
+                do {
+                    currentClue = (currentClue +
+                        (reverse ? (clues.length - 1) : 1)) %
+                        clues.length;
+
+                    focusRow = clues[currentClue].row;
+                    focusCol = clues[currentClue].col;
+                    currentWordDir = clues[currentClue].dir;
+                    findHighlightWord();
+                    // Note: if the next word is completely filled, skip to another word.
+                    // Once the puzzle is solved, this will go to the next clue ignoring
+                    // whether they are filled (otherwise it would go into an infinite
+                    // loop)
+                } while (!findNextUnfilledCell() && !solved);
+
+                drawPuzzleGrid();
             }
 
             function handleKeyDown(event) {
@@ -324,16 +343,7 @@ limitations under the License.
                         break;
                     case 'Tab':
                         event.preventDefault();
-                        currentClue = (currentClue +
-                            (event.shiftKey ? (clues.length - 1) : 1)) %
-                            clues.length;
-
-                        focusRow = clues[currentClue].row;
-                        focusCol = clues[currentClue].col;
-                        currentWordDir = clues[currentClue].dir;
-                        findHighlightWord();
-                        findNextUnfilled();
-                        drawPuzzleGrid();
+                        goToNextClue(event.shiftKey);
                         break;
                     case 'Backspace':
                         if (!solved) {
@@ -356,7 +366,7 @@ limitations under the License.
 
             function enterLetter(val) {
                 setCellValue(focusRow, focusCol, val);
-                findNextUnfilled();
+                findNextUnfilledCell();
                 updateFocus();
 
                 if (answerSquares == currentSquares) {
@@ -383,12 +393,12 @@ limitations under the License.
                 setCellValue(focusRow, focusCol, ' ');
                 if (currentWordDir == 'across') {
                     if (focusCol > 0 &&
-                        getCellValue(focusRow, focusCol - 1) != BLANK) {
+                        getCellValue(focusRow, focusCol - 1) != BLACK_SQUARE) {
                         focusCol--;
                     }
                 } else {
                     if (focusRow > 0 &&
-                        getCellValue(focusRow - 1, focusCol) != BLANK) {
+                        getCellValue(focusRow - 1, focusCol) != BLACK_SQUARE) {
                         focusRow--;
                     }
                 }
@@ -396,17 +406,17 @@ limitations under the License.
                 drawPuzzleGrid();
             }
 
-            function findNextUnfilled() {
+            function findNextUnfilledCell() {
                 if (currentWordDir == 'across') {
                     let newCol = focusCol;
                     while (newCol < numCols) {
                         const val = getCellValue(focusRow, newCol);
-                        if (val == BLANK) {
-                            // No more blanks remaining
+                        if (val == BLACK_SQUARE) {
+                            // No more empty cell remaining
                             break;
                         } else  if (val == ' ') {
                             focusCol = newCol;
-                            break;
+                            return true;
                         }
 
                         newCol++;
@@ -415,17 +425,19 @@ limitations under the License.
                     let newRow = focusRow;
                     while (newRow < numRows) {
                         const val = getCellValue(newRow, focusCol);
-                        if (val == BLANK) {
-                            // No more blanks remaining
+                        if (val == BLACK_SQUARE) {
+                            // No more empty cells remaining
                             break;
                         } else  if (val == ' ') {
                             focusRow = newRow;
-                            break;
+                            return true;
                         }
 
                         newRow++;
                     }
                 }
+
+                return false;
             }
 
             function handleMouseDown(event) {
@@ -435,7 +447,7 @@ limitations under the License.
                 const clickCol = Math.floor(x / cellWidth);
                 const clickRow = Math.floor(y / cellHeight);
                 if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
-                    if (getCellValue(clickRow, clickCol) != BLANK) {
+                    if (getCellValue(clickRow, clickCol) != BLACK_SQUARE) {
                         focusRow = clickRow;
                         focusCol = clickCol;
                         updateFocus();
@@ -445,22 +457,22 @@ limitations under the License.
 
             function findWordBoundaries() {
                 let left = focusCol;
-                while (left > 0 && getCellValue(focusRow, left - 1) != BLANK) {
+                while (left > 0 && getCellValue(focusRow, left - 1) != BLACK_SQUARE) {
                     left--;
                 }
 
                 let right = focusCol;
-                while (right < numCols - 1 && getCellValue(focusRow, right + 1) != BLANK) {
+                while (right < numCols - 1 && getCellValue(focusRow, right + 1) != BLACK_SQUARE) {
                     right++;
                 }
 
                 let top = focusRow;
-                while (top > 0 && getCellValue(top - 1, focusCol) != BLANK) {
+                while (top > 0 && getCellValue(top - 1, focusCol) != BLACK_SQUARE) {
                     top--;
                 }
 
                 let bottom = focusRow;
-                while (bottom < numRows - 1 && getCellValue(bottom + 1, focusCol) != BLANK) {
+                while (bottom < numRows - 1 && getCellValue(bottom + 1, focusCol) != BLACK_SQUARE) {
                     bottom++;
                 }
 
