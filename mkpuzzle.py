@@ -18,21 +18,21 @@ import json
 import sys
 import argparse
 
-BLANK = '_'
+BLACK_SQUARE = '_'
 clues = []
-cross_lookup = {}
+letter_to_word_offs = {}
 
 
-def init_cross_lookup():
+def init_lookup_table():
     """Create a lookup table to find all words that have a specific letter in
     them.
     """
     for word_index, (word, _) in enumerate(clues):
         for offset, letter in enumerate(word):
-            if letter in cross_lookup:
-                cross_lookup[letter].append((word_index, offset))
+            if letter in letter_to_word_offs:
+                letter_to_word_offs[letter].append((word_index, offset))
             else:
-                cross_lookup[letter] = [(word_index, offset)]
+                letter_to_word_offs[letter] = [(word_index, offset)]
 
 
 def try_to_add_word(puzzle_data, size, row, col, dir, word):
@@ -62,12 +62,12 @@ def try_to_add_word(puzzle_data, size, row, col, dir, word):
 
     # Ensure the first and last letters do not abut another
     if dir == 'across':
-        if ((col > 0 and result[row * size + col - 1] != BLANK) or
-            (col < size - 1 and result[row * size + col + len(word)] != BLANK)):
+        if ((col > 0 and result[row * size + col - 1] != BLACK_SQUARE) or
+            (col < size - 1 and result[row * size + col + len(word)] != BLACK_SQUARE)):
             return None # Cannot abut on end or beginning
     else:
-        if ((row > 0 and result[(row - 1) * size + col] != BLANK) or
-            (row < size - 1 and result[(row + len(word)) * size + col] != BLANK)):
+        if ((row > 0 and result[(row - 1) * size + col] != BLACK_SQUARE) or
+            (row < size - 1 and result[(row + len(word)) * size + col] != BLACK_SQUARE)):
             return None # Cannot abut on end or beginning
 
     for i, letter in enumerate(word):
@@ -78,20 +78,20 @@ def try_to_add_word(puzzle_data, size, row, col, dir, word):
             pd_index += i * size
 
         existing = result[pd_index]
-        if existing == BLANK:
+        if existing == BLACK_SQUARE:
             # Look to the sides to ensure we aren't inadvertently creating an
             # adjacent word. This makes our crosswords sparse.
             if dir == 'across':
-                if row > 0 and result[pd_index - size] != BLANK:
+                if row > 0 and result[pd_index - size] != BLACK_SQUARE:
                     return None
 
-                if row < size - 1 and result [pd_index + size] != BLANK:
+                if row < size - 1 and result [pd_index + size] != BLACK_SQUARE:
                     return None
             else:
-                if col > 0 and result[pd_index - 1] != BLANK:
+                if col > 0 and result[pd_index - 1] != BLACK_SQUARE:
                     return None
 
-                if col < (size - 1) and result[pd_index + 1] != BLANK:
+                if col < (size - 1) and result[pd_index + 1] != BLACK_SQUARE:
                     return None
         elif existing != letter:
             return None  # Conflict
@@ -137,7 +137,7 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
 
     new_dir = 'across' if dir == 'down' else 'down'
     for letter_offset, letter in enumerate(word):
-        cross_words = cross_lookup[letter]
+        cross_words = letter_to_word_offs[letter]
         for word_index, word_offset in cross_words:
             if used_word_map[word_index]:
                 continue
@@ -177,7 +177,7 @@ def try_to_expand_word(puzzle_data, size, used_word_map, row, col, dir, word):
 
 def create_puzzle(size):
     # Place initial word near the middle of the puzzle
-    empty_grid = [BLANK for _ in range(size * size)]
+    empty_grid = [BLACK_SQUARE for _ in range(size * size)]
     used_word_map = [False for _ in range(len(clues))]
 
     initial_word_index = 0  # This will be longest
@@ -277,7 +277,7 @@ def main():
 
     load_clues(args.clue_file)
     size = args.size
-    init_cross_lookup()
+    init_lookup_table()
     result = create_puzzle(size)
     if result is None:
         print('cannot find a solution', file=sys.stderr)
