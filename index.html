@@ -88,7 +88,7 @@ limitations under the License.
             let currentClue = 0;
             let lastBoldedClueDiv = null;
 
-            function init() {
+            function onPageLoad() {
                 canvas = document.getElementById('c');
                 context = canvas.getContext('2d');
                 document.onkeydown = handleKeyDown;
@@ -106,11 +106,72 @@ limitations under the License.
                 fetch('puzzle.json').then((response) => {
                     return response.json();
                 }).then((puzzleData) => {
-                    loadPuzzle(puzzleData);
+                    populatePuzzleData(puzzleData);
                 });
             }
 
-            function loadPuzzle(puzzle) {
+            function handleMouseDown(event) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                const clickCol = Math.floor(x / cellWidth);
+                const clickRow = Math.floor(y / cellHeight);
+                if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
+                    if (getCellValue(clickRow, clickCol) != BLACK_SQUARE) {
+                        focusRow = clickRow;
+                        focusCol = clickCol;
+                        handleFocusUpdate();
+                    }
+                }
+            }
+
+            function handleKeyDown(event) {
+                switch (event.key) {
+                    case 'ArrowDown':
+                        moveFocusDown();
+                        break;
+                    case 'ArrowRight':
+                        moveFocusRight();
+                        break;
+                    case 'ArrowUp':
+                        moveFocusUp();
+                        break;
+                    case 'ArrowLeft':
+                        moveFocusLeft();
+                        break;
+                    case ' ':
+                        swapHighlightDirection();
+                        break;
+                    case 'Tab':
+                        event.preventDefault();
+                        goToNextClue(event.shiftKey);
+                        break;
+                    case 'Backspace':
+                        if (!solved) {
+                            backspace();
+                        }
+                        break;
+                    default: {
+                        if (!solved && event.key.length == 1) {
+                            const code = event.key.charCodeAt(0);
+                            if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
+                                (code > 96 && code < 123)) {
+                                    enterLetter(event.key);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            /**
+             * Given puzzle data loaded externally, update all internal
+             * data structures and set up page elements.
+             * @param puzzle {object} All data for puzzle, loaded from
+             *    JSON.
+             */
+            function populatePuzzleData(puzzle) {
                 document.getElementById('title').innerText = puzzle.title;
 
                 numRows = puzzle.numRows;
@@ -153,7 +214,7 @@ limitations under the License.
                             focusRow = clue.row;
                             focusCol = clue.col;
                             currentWordDir = clue.dir;
-                            updateFocus();
+                            handleFocusUpdate();
                         };
                     }
 
@@ -167,7 +228,7 @@ limitations under the License.
                 focusRow = clues[0].row;
                 focusCol = clues[0].col;
                 currentWordDir = clues[0].dir;
-                updateFocus();
+                handleFocusUpdate();
             }
 
             function getCellValue(row, col) {
@@ -260,114 +321,77 @@ limitations under the License.
                 }
             }
 
-            function updateFocus() {
-                findHighlightWord();
+            function handleFocusUpdate() {
+                updateWordHighlight();
                 drawPuzzleGrid();
             }
 
-            function navigateRight() {
+            function moveFocusRight() {
                 for (let i = focusCol + 1; i < numCols; i++) {
                     if (getCellValue(focusRow, i) != BLACK_SQUARE) {
                         focusCol = i;
-                        updateFocus();
+                        handleFocusUpdate();
                         break;
                     }
                 }
             }
 
-            function navigateLeft() {
+            function moveFocusLeft() {
                 for (let i = focusCol - 1; i >= 0; i--) {
                     if (getCellValue(focusRow, i) != BLACK_SQUARE) {
                         focusCol = i;
-                        updateFocus();
+                        handleFocusUpdate();
                         break;
                     }
                 }
             }
 
-            function navigateUp() {
+            function moveFocusUp() {
                 for (let i = focusRow - 1; i >= 0; i--) {
                     if (getCellValue(i, focusCol) != BLACK_SQUARE) {
                         focusRow = i;
-                        updateFocus();
+                        handleFocusUpdate();
                         break;
                     }
                 }
             }
 
-            function navigateDown() {
+            function moveFocusDown() {
                 for (let i = focusRow + 1; i < numRows; i++) {
                     if (getCellValue(i, focusCol) != BLACK_SQUARE) {
                         focusRow = i;
-                        updateFocus();
+                        handleFocusUpdate();
                         break;
                     }
                 }
             }
 
             function goToNextClue(reverse) {
-                do {
+                // If all clues are filled (but not necessarily correct), this
+                // will just go to the next one (by virtue of this loop
+                // scanning N+1 entries).
+                for (let i = 0; i <= clues.length; i++) {
                     currentClue = (currentClue +
-                        (reverse ? (clues.length - 1) : 1)) %
-                        clues.length;
+                        (reverse ? (clues.length - 1) : 1)) % clues.length;
 
                     focusRow = clues[currentClue].row;
                     focusCol = clues[currentClue].col;
                     currentWordDir = clues[currentClue].dir;
-                    findHighlightWord();
+                    updateWordHighlight();
                     // Note: if the next word is completely filled, skip to another word.
                     // Once the puzzle is solved, this will go to the next clue ignoring
-                    // whether they are filled (otherwise it would go into an infinite
-                    // loop)
-                } while (!findNextUnfilledCell() && !solved);
+                    // whether they are filled.
+                    if (findNextUnfilledCell() || solved)
+                        break;
+                }
 
                 drawPuzzleGrid();
-            }
-
-            function handleKeyDown(event) {
-                switch (event.key) {
-                    case 'ArrowDown':
-                        navigateDown();
-                        break;
-                    case 'ArrowRight':
-                        navigateRight();
-                        break;
-                    case 'ArrowUp':
-                        navigateUp();
-                        break;
-                    case 'ArrowLeft':
-                        navigateLeft();
-                        break;
-                    case ' ':
-                        swapHighlightDirection();
-                        break;
-                    case 'Tab':
-                        event.preventDefault();
-                        goToNextClue(event.shiftKey);
-                        break;
-                    case 'Backspace':
-                        if (!solved) {
-                            backspace();
-                        }
-                        break;
-                    default: {
-                        if (!solved && event.key.length == 1) {
-                            const code = event.key.charCodeAt(0);
-                            if ((code > 47 && code < 58) || (code > 64 && code < 91) ||
-                                (code > 96 && code < 123)) {
-                                    enterLetter(event.key);
-                            }
-                        }
-
-                        break;
-                    }
-                }
             }
 
             function enterLetter(val) {
                 setCellValue(focusRow, focusCol, val);
                 findNextUnfilledCell();
-                updateFocus();
+                handleFocusUpdate();
 
                 if (answerSquares == currentSquares) {
                     solved = true;
@@ -381,12 +405,9 @@ limitations under the License.
             }
 
             function swapHighlightDirection() {
-                if (currentWordDir == 'across') {
-                    currentWordDir = 'down';
-                } else {
-                    currentWordDir = 'across';
-                }
-                updateFocus();
+                currentWordDir = currentWordDir == 'across' ?
+                    'down' : 'across';
+                handleFocusUpdate();
             }
 
             function backspace() {
@@ -440,22 +461,13 @@ limitations under the License.
                 return false;
             }
 
-            function handleMouseDown(event) {
-                const rect = canvas.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                const clickCol = Math.floor(x / cellWidth);
-                const clickRow = Math.floor(y / cellHeight);
-                if (clickCol >= 0 && clickCol < numCols && clickRow >= 0 && clickRow < numRows) {
-                    if (getCellValue(clickRow, clickCol) != BLACK_SQUARE) {
-                        focusRow = clickRow;
-                        focusCol = clickCol;
-                        updateFocus();
-                    }
-                }
-            }
-
-            function findWordBoundaries() {
+            /**
+             * Find the beginning and ending cells for words containing the focused
+             * cell.
+             * @returns {[number, number, number, number]} left, right, top, bottom
+             *     columns/rows respectively.
+             */
+            function findWordExtents() {
                 let left = focusCol;
                 while (left > 0 && getCellValue(focusRow, left - 1) != BLACK_SQUARE) {
                     left--;
@@ -476,11 +488,11 @@ limitations under the License.
                     bottom++;
                 }
 
-                return [left, top, right, bottom];
+                return [left, right, top, bottom];
             }
 
-            function findHighlightWord() {
-                let [left, top, right, bottom] = findWordBoundaries();
+            function updateWordHighlight() {
+                let [left, right, top, bottom] = findWordExtents();
                 if (left == right && left == focusCol) {
                     // There is no horizontal word
                     currentWordDir = 'down';
@@ -531,7 +543,7 @@ limitations under the License.
             }
         </script>
     </head>
-    <body onload="init()">
+    <body onload="onPageLoad()">
         <div id="title"></div>
         <div id="top">
             <canvas id="c" width="600" height="600"></canvas>
