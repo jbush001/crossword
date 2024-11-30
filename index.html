@@ -366,6 +366,10 @@ limitations under the License.
                 }
             }
 
+            /**
+             * Find the next unfilled clue.
+             * @param {bool} reverse If true, goes to previous clue.
+             */
             function goToNextClue(reverse) {
                 // If all clues are filled (but not necessarily correct), this
                 // will just go to the next one (by virtue of this loop
@@ -388,8 +392,12 @@ limitations under the License.
                 drawPuzzleGrid();
             }
 
-            function enterLetter(val) {
-                setCellValue(focusRow, focusCol, val);
+            /**
+             * Fill in the currently focused cell with a letter, then move
+             * to the next unfilled cell (if possible).
+             */
+            function enterLetter(letter) {
+                setCellValue(focusRow, focusCol, letter);
                 findNextUnfilledCell();
                 handleFocusUpdate();
 
@@ -400,16 +408,29 @@ limitations under the License.
                 }
             }
 
+            /**
+             * Pop up dialog to inform the user they have solved the puzzle.
+             * @todo Could present some stats or other information here.
+             */
             function displaySuccessMessage() {
                 document.getElementById('successmsg').style.display = 'block';
             }
 
+            /**
+             * Switch between a vertical and horizontal highlighted word,
+             * if possible. Otherwise this has no effect.
+             */
             function swapHighlightDirection() {
                 currentWordDir = currentWordDir == 'across' ?
                     'down' : 'across';
                 handleFocusUpdate();
             }
 
+            /**
+             * Clear the contents of the current cell and, if possible, move
+             * the focus to the previous cell in the currently highlighted
+             * word.
+             */
             function backspace() {
                 setCellValue(focusRow, focusCol, ' ');
                 if (currentWordDir == 'across') {
@@ -427,6 +448,13 @@ limitations under the License.
                 drawPuzzleGrid();
             }
 
+            /**
+             * Search from the focus position to the end of the highlighted
+             * word to find the next blank cell.
+             * Update the focus to the blank cell if one is found.
+             * @returns true if it found a blank cell, false if there are
+             *   no blank cells remaining.
+             */
             function findNextUnfilledCell() {
                 if (currentWordDir == 'across') {
                     let newCol = focusCol;
@@ -491,6 +519,10 @@ limitations under the License.
                 return [left, right, top, bottom];
             }
 
+            /**
+             * Given a change of the focus cell, update information about which word
+             * to highlight.
+             */
             function updateWordHighlight() {
                 let [left, right, top, bottom] = findWordExtents();
                 if (left == right && left == focusCol) {
@@ -500,9 +532,9 @@ limitations under the License.
                     // There is no vertical word
                     currentWordDir = 'across';
                 }
-
                 // else there is both a horizontal and vertical word here and
                 // currentWordDir remains what it was previously.
+
                 if (currentWordDir == 'down') {
                     currentWordStart = top;
                     currentWordEnd = bottom;
@@ -511,11 +543,14 @@ limitations under the License.
                     currentWordEnd = right;
                 }
 
-                // Find the corresponding clue
-                findCurrentClue();
+                updateCurrentClue();
             }
 
-            function findCurrentClue() {
+            /**
+             * Figures out which clue corresponds to the highlighted word and
+             * highlight it in the clue list.
+             */
+            function updateCurrentClue() {
                 if (lastBoldedClueDiv !== null) {
                     lastBoldedClueDiv.style.backgroundColor = 'transparent';
                     lastBoldedClueDiv = null;
