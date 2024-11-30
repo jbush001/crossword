@@ -86,7 +86,6 @@ limitations under the License.
             let currentWordEnd = 0;
             let currentWordDir = 'down';
             let currentClue = 0;
-            let lastBoldedClueDiv = null;
 
             function onPageLoad() {
                 canvas = document.getElementById('c');
@@ -551,11 +550,6 @@ limitations under the License.
              * highlight it in the clue list.
              */
             function updateCurrentClue() {
-                if (lastBoldedClueDiv !== null) {
-                    lastBoldedClueDiv.style.backgroundColor = 'transparent';
-                    lastBoldedClueDiv = null;
-                }
-
                 currentClue = -1;
                 for (let i = 0; i < clues.length; i++) {
                     const clue = clues[i];
@@ -569,10 +563,10 @@ limitations under the License.
                         clue.col == currentWordStart;
                     if (downMatch || acrossMatch) {
                         clue.element.style.backgroundColor = 'lightblue';
-                        lastBoldedClueDiv = clue.element;
                         clue.element.scrollIntoView({block: 'nearest'});
                         currentClue = i;
-                        break;
+                    } else {
+                        clue.element.style.backgroundColor = 'transparent';
                     }
                 }
             }
