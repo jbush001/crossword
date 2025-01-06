@@ -384,7 +384,7 @@ limitations under the License.
                     // Note: if the next word is completely filled, skip to another word.
                     // Once the puzzle is solved, this will go to the next clue ignoring
                     // whether they are filled.
-                    if (findNextUnfilledCell() || solved)
+                    if (goToNextUnfilledCell() || solved)
                         break;
                 }
 
@@ -397,7 +397,21 @@ limitations under the License.
              */
             function enterLetter(letter) {
                 setCellValue(focusRow, focusCol, letter);
-                findNextUnfilledCell();
+                if (!goToNextUnfilledCell()) {
+                    // If can't find an unfilled cell, go to next letter.
+                    if (currentWordDir == 'across') {
+                        if (focusCol < numCols - 1
+                            && getCellValue(focusRow, focusCol + 1) != BLACK_SQUARE) {
+                            focusCol += 1;
+                        }
+                    } else {
+                        if (focusRow < numRows - 1
+                            && getCellValue(focusRow + 1, focusCol) != BLACK_SQUARE) {
+                            focusRow += 1;
+                        }
+                    }
+                }
+
                 handleFocusUpdate();
 
                 if (answerSquares == currentSquares) {
@@ -454,7 +468,7 @@ limitations under the License.
              * @returns true if it found a blank cell, false if there are
              *   no blank cells remaining.
              */
-            function findNextUnfilledCell() {
+            function goToNextUnfilledCell() {
                 if (currentWordDir == 'across') {
                     let newCol = focusCol;
                     while (newCol < numCols) {
